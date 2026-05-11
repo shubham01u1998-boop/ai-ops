@@ -54,9 +54,11 @@ Detect multiple distinct requirements before processing. State: "I found [N] req
 Process sequentially — complete one fully before starting the next. Show one batch review table for all at the end.
 
 ## S8 — Duplicate Check
-Before adding to batch table: search_tickets(query=[first 5 words of title], limit=3) and search_tickets(query=[key noun from what], limit=3).
-If overlap found: flag ⚠️ possible duplicate with matching ticket ID. Do not block — flag only, human decides.
-If MCP unavailable: flag all as ⚠️ duplicate check skipped — verify manually before confirming.
+Run AFTER REQ{} is fully assembled. Use finalised ti: as primary search term.
+Run in parallel: search_tickets(first 3 words of ti:, limit=5) | search_tickets(most distinctive noun from what:, limit=5) | search_tickets(component name if identifiable, limit=5).
+Also check: was a ticket with this title created earlier in this session? If yes: flag ⚠️ already created this session — #[id]. Do not create again.
+If overlap found: flag ⚠️ possible duplicate of #[id] — [title]. Do not block — flag only, human decides.
+If MCP unavailable: flag ⚠️ duplicate check skipped — verify manually.
 
 ## S9 — Inline Mapper (Phase 1)
 On CONFIRM ALL, for each REQ{} block:

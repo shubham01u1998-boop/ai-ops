@@ -7,6 +7,7 @@ Pin this in your Teams channel. Copy the relevant section, fill it in, post in #
 
 Title*:
 Environment*:         prod / staging / dev
+Device / browser:     (e.g. iPhone 14 iOS 17, Chrome 124, Android 13)
 What happened*:
 What should happen*:
 Steps to reproduce:
@@ -27,6 +28,7 @@ Problem it solves*:
 Acceptance criteria*:
   -
   -
+Urgency:              blocking work / needed soon / nice to have
 Which users benefit:
 Any constraints or notes:
 PRD / design link:
@@ -40,6 +42,7 @@ Title*:
 Current behaviour:
 What better looks like*:
 Why it matters:
+Who benefits:         (all users / developers / QA / specific role)
 Reported by*:
 
 ---
@@ -50,10 +53,14 @@ Title*:
 What needs doing:
 Definition of done*:
   -
+Deadline or target sprint:
+Reason it's needed now:
 Blocked by / depends on:
 Reported by*:
 
 ---
 
-**How to use** — copy the relevant section above, fill it in, and post in #bugs or #requirements.
+**How to use**
+**Phase 1:** Copy your filled template and paste it directly into the "Ticket Intake — TiffinConnect" Project in Claude Enterprise.
+**Phase 3 (coming):** Post in #bugs or #requirements — the Teams bot will pick it up automatically.
 Fields marked `*` are required. Everything else is optional but improves ticket quality.

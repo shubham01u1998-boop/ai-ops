@@ -1,5 +1,5 @@
 # TEAM_CONTEXT — TiffinConnect
-# VERSION: 1.2 | Last reviewed: 2026-05-12 | Lines: 116/200 | Maintained by: Lead
+# VERSION: 1.3 | Last reviewed: 2026-05-14 | Lines: 128/200 | Maintained by: Lead
 # Rules: Do not edit Section 5 manually — auto-populated during sessions.
 # When Section 5 hits 30 lines, review and prune before next session.
 
@@ -14,13 +14,22 @@ Full session:          load all sections
 ---
 
 ## Section 1: Team Roster
-Format: Name | Role | Odoo User ID | Area of ownership
+Format: Name | Job Title | Odoo User ID | Area of ownership
 
 Sahil Tyagi      | Frontend Developer | 50 | UI, components, frontend bugs
 Vijay Mehrotra   | Frontend Developer | 62 | UI, components, frontend bugs
 Kunal Sharma     | Backend Developer  | 41 | API, database, backend bugs
 Tanu Lamba       | Backend Developer  | 57 | API, database, backend bugs
 Shubham Upadhyay | QA Engineer        | 42 | Testing, bug verification, QA intake
+
+## System Roles
+QA Lead:      Shubham Upadhyay (Odoo ID: 42)
+PM:           (vacant — update when hired)
+Lead:         Shubham Upadhyay (Odoo ID: 42)
+Triage Owner: Shubham Upadhyay (Phase 3 — TRIAGE_AGENT)
+
+Escalation path: QA Lead → PM (when joined)
+Skills and skill files reference roles, not names. Update this block when roles change.
 
 ---
 

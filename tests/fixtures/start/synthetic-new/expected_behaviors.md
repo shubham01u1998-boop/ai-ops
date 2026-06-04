@@ -26,17 +26,17 @@
 - [ ] On "no": outputs "Cancelled — no folders created." and stops
 
 ## Files Created (on confirm)
-- [ ] Folder slug is lowercase, hyphens for spaces: "RetailEdge" → retailedge
+- [ ] Folder slug is lowercase, hyphens for spaces, no special chars: "RetailEdge" → retailedge | "Vector Seven" → vector-seven
 - [ ] project.md written with correct content:
       # Project — RetailEdge
       Client: FreshMart
       Type: PWA
-      Started: <today's date>
+      Started: <today: YYYY-MM-DD>
       Stage: not started
-      Last session: <today's date>
+      Last session: <today: YYYY-MM-DD>
 - [ ] session_state.md written with correct content:
       # Session State — RetailEdge
-      # Updated: <today's date>
+      # Updated: <today: YYYY-MM-DD>
       ## Current Stage
       Last completed: none
       Status: not started

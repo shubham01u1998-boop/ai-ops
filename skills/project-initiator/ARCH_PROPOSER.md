@@ -166,3 +166,103 @@ Any components to add, rename, split, or remove?
 
 One confirmation prompt. Consultant can edit freely. ARCH_PROPOSER re-shows affected
 section after changes. Shared components flagged inline and in `arch.md ## Components`.
+
+---
+
+## Integration Points
+
+Built silently from `## Constraints → Other:` and the component map. Presented as a
+single block with risk ratings:
+
+```
+Integration points identified:
+
+1. Oracle Retail POS — reads sales + inventory data
+   Proposed approach: REST API (if available) or scheduled DB export
+   Auth: TBD — needs Oracle Retail access credentials
+   Risk: HIGH [STRAWMAN] — integration method unconfirmed; affects build order
+   Open Question: Does Oracle Retail expose a REST API, or is this a DB/file export?
+
+2. Offline mode — stores with poor connectivity
+   Proposed approach: Service Worker + IndexedDB cache; sync on reconnect
+   Risk: MED [STRAWMAN] — adds frontend complexity; staleness window not confirmed
+   Open Question: What's the acceptable data staleness window when offline?
+
+Any integrations to add, change, or remove? Any Open Questions you can resolve now?
+```
+
+Unresolved integration Open Questions → carried into `arch.md ## Open Questions`.
+BACKLOG_GENERATOR will flag these as blockers on affected tickets.
+
+---
+
+## Build Order + Sprint Mapping
+
+### Team composition input
+Before sprint mapping, ask once:
+```
+What's the team for this engagement?
+(e.g. "2 frontend: 5y + 2y, 2 backend: 6y + 3y, 1 QA: 5y")
+```
+If not provided: proceed with [STRAWMAN] assumption of 1 BE senior + 1 FE senior.
+
+### Layer 1 — Technical dependency order
+Derive from shared components and integration risks. Show as ordered list with rationale:
+```
+Build order (dependency-driven):
+1. OracleConnector — shared; both features depend on it
+2. SalesAggregator + data model — backend before API
+3. SalesAPI + AlertEngine — logic before UI
+4. DashboardUI + AlertsUI — frontend last
+5. Offline mode layer — additive on top of DashboardUI
+```
+
+### Layer 2 — Sprint mapping
+Derive from timeline (from mvp-scope.md) + team size + seniority.
+Sprint length default: 2 weeks. Ask if consultant wants a different cadence.
+Senior devs own complex/integration components. Junior devs on simpler pieces with
+review buffer. Present as table:
+
+```
+Team: 2 FE (5y+2y), 2 BE (6y+3y), 1 QA (5y)
+Timeline: 2026-06-04 → 2026-09-04 (13 weeks / 6 × 2-week sprints)
+
+| Sprint | Work | Owner |
+|---|---|---|
+| 1–2 | OracleConnector + data model + SalesAggregator | BE-senior (6y) + BE-junior (3y) |
+| 3–4 | SalesAPI + AlertEngine + AlertsUI | BE-senior + FE-senior (5y) |
+| 5 | DashboardUI + QA integration testing | FE-senior + FE-junior (2y) + QA |
+| 6 | Offline mode + UAT + go-live prep | FE-senior + QA |
+
+[STRAWMAN] — assumes parallel BE+FE tracks from Sprint 3. Adjust if dependencies shift.
+```
+
+One confirmation block. Consultant can shift components or adjust sprint length.
+
+---
+
+## Effort Signals
+
+S/M/L/XL per feature, derived from component count + integration risk + team seniority.
+Proposed by ARCH_PROPOSER, confirmed by consultant.
+
+| Size | Meaning |
+|---|---|
+| S | 1–3 days, 1 developer, no integration risk |
+| M | 1–2 weeks, 1 developer, low integration risk |
+| L | 2–4 weeks, 1–2 developers, medium integration risk |
+| XL | 4+ weeks, multiple developers, high integration/unknowns |
+
+Present as a table:
+```
+| Feature | Size | Rationale |
+|---|---|---|
+| Sales Dashboard | L | 4 components; OracleConnector dependency; data aggregation complexity |
+| Inventory Alerts | M | 3 components; reuses OracleConnector; alert logic simpler than aggregation |
+| OracleConnector (shared) | L | HIGH-risk [STRAWMAN] — integration method unconfirmed; could become XL if REST API unavailable |
+| Offline mode | M | Service Worker + IndexedDB; additive; requires scale testing |
+
+Agree, or adjust any sizes?
+```
+
+**Auto-STRAWMAN:** XL estimates and HIGH-risk components automatically get `[STRAWMAN]`.

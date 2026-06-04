@@ -367,6 +367,43 @@ Next: run BACKLOG_GENERATOR to generate Odoo tickets from arch.md (not yet built
 
 ---
 
+## Write Session State
+
+After saving arch.md, silently:
+
+1. Write/update `session_state.md` in the current directory:
+
+```markdown
+# Session State — <engagement name>
+# Updated: <YYYY-MM-DD>
+
+## Current Stage
+Last completed: ARCH_PROPOSER
+Status: complete
+
+## Next Step
+Run: DOC_GENERATOR
+From: <current directory path>
+
+## Open Items
+<list each item from arch.md ## Open Questions section, one per line as:
+- <question> — source: ARCH_PROPOSER — blocks: <component or ticket noted in arch.md>>
+If no open questions: (none)
+
+## Notes
+```
+
+2. If `project.md` exists in the current directory, update two fields only:
+   - `Stage: ARCH_PROPOSER complete`
+   - `Last session: <today: YYYY-MM-DD>`
+   Leave all other fields unchanged.
+
+3. If `project.md` does not exist: skip step 2 silently.
+
+Output one line: `session_state.md updated.`
+
+---
+
 ## Rules for this skill
 
 1. Never create Odoo tickets — that is BACKLOG_GENERATOR's job (V1.4).

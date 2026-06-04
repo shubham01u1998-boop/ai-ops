@@ -212,6 +212,43 @@ discovery.md saved. DISCOVERY complete.
 
 ---
 
+## Write Session State
+
+After saving discovery.md, silently:
+
+1. Write/update `session_state.md` in the current directory:
+
+```markdown
+# Session State — <engagement name>
+# Updated: <YYYY-MM-DD>
+
+## Current Stage
+Last completed: DISCOVERY
+Status: complete
+
+## Next Step
+Run: MVP_SYNTHESIZER
+From: <current directory path>
+
+## Open Items
+<list each unresolved Open Question from discovery.md ## Open Questions section, one per line as:
+- <question> — source: DISCOVERY>
+If no open questions: (none)
+
+## Notes
+```
+
+2. If `project.md` exists in the current directory, update two fields only:
+   - `Stage: DISCOVERY complete`
+   - `Last session: <today: YYYY-MM-DD>`
+   Leave all other fields unchanged.
+
+3. If `project.md` does not exist: skip step 2 silently (engagement may predate V1.2).
+
+Output one line: `session_state.md updated.`
+
+---
+
 ## Rules for this skill
 
 1. Never choose architecture, MVP scope, or tech stack. Surface options and conflicts — the consultant decides.

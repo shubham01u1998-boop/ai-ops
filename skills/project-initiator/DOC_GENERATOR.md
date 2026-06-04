@@ -701,3 +701,58 @@ and that work will not commence until pre-conditions in Section 8 are resolved.
 | Title: | __________________ |
 | Date: | __________________ |
 ```
+
+## Review & Save
+
+Applied once per generated document. Same pattern as upstream skills in the chain.
+
+1. Show the full draft (all sections + all Mermaid diagrams).
+
+2. Prompt:
+```
+Looks complete — save <filename> to docs/? [A] Yes / [B] Edit a section / [C] Add more context
+```
+
+3. Natural-language handling:
+   - Clear approval ("yes", "save it", "looks good", "correct", "perfect", "go ahead") → interpret as [A]. Proceed to Save.
+   - Edit or correction offered ("change section 3", "the budget is wrong") → interpret as [B]. Apply the change, re-show only the affected section, re-offer the same prompt.
+   - New information offered → interpret as [C]. Update the draft silently, re-show with changes applied.
+   - Ambiguous → surface intent: "Reading this as [A] Save — correct? (yes / [B] edit a section / [C] add more context)"
+
+4. **Save:**
+   Per LAYER_0_GLOBAL Rule 1: the prompt above is the permission gate. Do not write the file
+   until the consultant explicitly approves — via [A], unambiguous natural-language approval,
+   or confirmation after an ambiguous-intent check.
+
+   Create `docs/` subfolder in the current working directory if it doesn't exist (silently).
+   Write the file to `<current working directory>/docs/<filename>`.
+
+   Confirm:
+   ```
+   docs/<filename> saved.
+   ```
+
+5. If more docs were selected: `Next: generating <next doc name>...` and repeat from Step 1.
+
+6. After all selected docs are saved:
+```
+DOC_GENERATOR complete.
+Saved to docs/: <comma-separated list of saved filenames>
+
+Next: run BACKLOG_GENERATOR to create Odoo tickets from arch.md (not yet built — V1.4).
+```
+
+---
+
+## Rules for this skill
+
+1. Never modify `discovery.md`, `mvp-scope.md`, or `arch.md` — DOC_GENERATOR is presentation layer only.
+2. Sync check: never skip it. Every invocation, before the menu appears.
+3. DRIFT items block the menu — all DRIFTs resolved or deferred before generation begins. Deferred DRIFTs become WARNs and are flagged as placeholders in the affected doc.
+4. Never auto-save — explicit consultant approval required for every doc.
+5. Docs must be professional quality — ready to share with clients or team without further editing.
+6. All diagrams use Mermaid syntax embedded in the markdown output.
+7. Client-facing docs (1 and 5): no component names, no framework names, no technical jargon anywhere in the document.
+8. `docs/` subfolder created silently if missing — no prompt needed.
+9. LAYER_0_GLOBAL Rule 4 output limits apply. Rule 5 (no narration) applies.
+10. V1.3.5 boundary: never create Odoo tickets — that is BACKLOG_GENERATOR (V1.4). Never modify upstream artifacts.

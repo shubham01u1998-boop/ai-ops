@@ -14,7 +14,7 @@ ai-ops/
   skills/
     core/                  # LAYER_0_GLOBAL.md, BUG_REPORT_TEMPLATE.md
     layers/                # LAYER_2_FASTPATH.md, QA_INTAKE.md
-    project-initiator/     # DISCOVERY.md (V1.0), future skills
+    project-initiator/     # DISCOVERY.md (V1.0), MVP_SYNTHESIZER.md (V1.1)
   context/                 # TEAM_CONTEXT.md, PARKING_LOT.md
   docs/
     superpowers/
@@ -22,6 +22,7 @@ ai-ops/
   tests/
     fixtures/
       discovery/           # Synthetic engagement fixtures for DISCOVERY testing
+      mvp-synthesizer/     # Synthetic engagement fixtures for MVP_SYNTHESIZER testing
   templates/               # future: generic project template
   ci/                      # future: GitLab CI integration
   odoo-mcp/                # Python MCP server (separate repo context)
@@ -42,7 +43,9 @@ ai-ops/
 | 6 | Generic project template extraction | Not started |
 | 7 | Teams bot, Power Automate, Azure Function | Not started |
 | PI V1.0 | DISCOVERY skill — built, tested on 2 synthetic fixtures (64/64) | Done |
-| PI V1.1+ | MVP_SYNTHESIZER → ARCH_PROPOSER → BACKLOG_GENERATOR → ROADMAP | Not started |
+| PI V1.1 | MVP_SYNTHESIZER skill — readiness gate + mvp-scope.md | Done |
+| PI V1.3 | ARCH_PROPOSER skill — built, tested on 2 synthetic fixtures (49/49 + 17/17) | Done |
+| PI V1.2+ | BACKLOG_GENERATOR → ROADMAP | Not started |
 
 ---
 
@@ -167,23 +170,49 @@ When asked for a bug report (any format — project-wide or single ticket):
 
 ---
 
-## Project Initiator (V1.0 — DISCOVERY only)
+## Project Initiator (V1.0 + V1.1 + V1.3)
+
+### DISCOVERY (V1.0 — done)
 
 Skill location: `skills/project-initiator/DISCOVERY.md`
 
-V1.0 scope: DISCOVERY skill only. No orchestrator. No SESSION_STATE.md. No per-engagement folder system.
-
 **Folder convention:** Each engagement gets its own named folder at `~/fiftyfive-engagements/<client-name>/` with an `input/` subfolder for raw docs. Multiple projects stay separate — one folder per client.
 
-**How to run:** Open Claude Code in the `<client-name>/` folder (not in `input/`). Say `run DISCOVERY`. DISCOVERY reads the folder name as the engagement name automatically.
+**How to run:** Open Claude Code in the `<client-name>/` folder (not in `input/`). Say `run DISCOVERY`. DISCOVERY reads the folder name as the engagement name automatically. Produces `discovery.md`.
 
 Design spec: `docs/superpowers/specs/2026-06-03-project-initiator-design.md`
 
-Test fixtures: `tests/fixtures/discovery/synthetic-01/` (SupplySync), `tests/fixtures/discovery/synthetic-02/` (StyleMart) — run DISCOVERY against these to verify the skill before deploying changes. Both fixtures scored 64/64 on 2026-06-03.
+Test fixtures: `tests/fixtures/discovery/synthetic-01/` (SupplySync), `tests/fixtures/discovery/synthetic-02/` (StyleMart) — both scored 64/64 on 2026-06-03.
 
-Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), not present in V1.0.
+### MVP_SYNTHESIZER (V1.1 — done)
 
-Target vision: DISCOVERY → MVP_SYNTHESIZER → ARCH_PROPOSER → BACKLOG_GENERATOR → ROADMAP — full chain documented in spec, none of it built in V1.0.
+Skill location: `skills/project-initiator/MVP_SYNTHESIZER.md`
+
+**How to run:** Open Claude Code in the `<client-name>/` folder (with `discovery.md` present). Say `run MVP_SYNTHESIZER`. Reads `discovery.md`, runs Readiness Gate, guides MVP scoping conversation. Produces `mvp-scope.md`.
+
+**Readiness Gate:** runs at the top of MVP_SYNTHESIZER before any skill logic. Checks discovery.md for required fields (Core Problem, Users, ≥2 Features, Timeline, no unresolved CONFLICTs). BLOCKs ask inline — consultant never redirected to re-run DISCOVERY.
+
+Design spec: `docs/superpowers/specs/2026-06-04-mvp-synthesizer-design.md`
+
+Test fixtures: `tests/fixtures/mvp-synthesizer/synthetic-01/` (SupplySync PASS-path), `tests/fixtures/mvp-synthesizer/synthetic-02-incomplete/` (RetailEdge BLOCK-path)
+
+### ARCH_PROPOSER (V1.3 — done)
+
+Skill location: `skills/project-initiator/ARCH_PROPOSER.md`
+
+**How to run:** Open Claude Code in the `<client-name>/` folder (with `discovery.md` and `mvp-scope.md` present). Say `run ARCH_PROPOSER`. Reads both files, runs Readiness Gate, guides architecture scoping conversation. Produces `architecture.md`.
+
+**Readiness Gate:** runs at the top of ARCH_PROPOSER before any skill logic. Checks discovery.md and mvp-scope.md for required fields (core problem defined, MVP scope complete, user roles identified). BLOCKs ask inline — consultant never redirected to re-run prior skills.
+
+Design spec: `docs/superpowers/specs/2026-06-04-mvp-synthesizer-design.md`
+
+Test fixtures: `tests/fixtures/arch-proposer/synthetic-01/` (SupplySync PASS-path, 49/49), `tests/fixtures/arch-proposer/synthetic-02/` (RetailEdge BLOCK-path, 17/17)
+
+### Chain status
+
+DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → BACKLOG_GENERATOR (V1.4, not started) → ROADMAP (future)
+
+Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), not yet built.
 
 MCP tools pending for future phases: `odoo-mcp/PENDING_CHANGES.md`
 

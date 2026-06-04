@@ -44,8 +44,10 @@ ai-ops/
 | 7 | Teams bot, Power Automate, Azure Function | Not started |
 | PI V1.0 | DISCOVERY skill — built, tested on 2 synthetic fixtures (64/64) | Done |
 | PI V1.1 | MVP_SYNTHESIZER skill — readiness gate + mvp-scope.md | Done |
+| PI V1.2 | START skill + SESSION_STATE integration | Done |
 | PI V1.3 | ARCH_PROPOSER skill — built, tested on 2 synthetic fixtures (49/49 + 17/17) | Done |
-| PI V1.2+ | BACKLOG_GENERATOR → ROADMAP | Not started |
+| PI V1.3.5 | DOC_GENERATOR skill | Not started |
+| PI V1.4 | BACKLOG_GENERATOR | Not started |
 
 ---
 
@@ -208,11 +210,24 @@ Design spec: `docs/superpowers/specs/2026-06-04-mvp-synthesizer-design.md`
 
 Test fixtures: `tests/fixtures/arch-proposer/synthetic-01/` (SupplySync PASS-path, 49/49), `tests/fixtures/arch-proposer/synthetic-02/` (RetailEdge BLOCK-path, 17/17)
 
+### START (V1.2 — done)
+
+Skill location: `skills/project-initiator/START.md`
+
+**How to run:** From `~/fiftyfive-engagements/` parent directory. Say `run START`.
+New project: creates folder + project.md + session_state.md with human confirmation.
+Resume: scans engagement folders, displays registry, routes to next skill.
+Also runs from inside a client folder as a shortcut to resume that engagement.
+
+Design spec: `docs/superpowers/specs/2026-06-04-v12-orchestrator-design.md`
+
+Test fixtures: `tests/fixtures/start/synthetic-new/` (new project path, 18/18), `tests/fixtures/start/synthetic-resume/` (registry + resume path, 19/19)
+
 ### Chain status
 
-DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → BACKLOG_GENERATOR (V1.4, not started) → ROADMAP (future)
+START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (V1.3.5, not started) → BACKLOG_GENERATOR (V1.4, not started) → ROADMAP (future)
 
-Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), not yet built.
+Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), now in progress with START skill.
 
 MCP tools pending for future phases: `odoo-mcp/PENDING_CHANGES.md`
 

@@ -1,0 +1,199 @@
+# VERSION: 1.0 | Last updated: 2026-06-04 | Reviewed: pending
+# START — Project Initiator V1.2
+# Part of the fiftyfive-tech Project Initiator toolchain.
+
+---
+
+## Purpose
+
+START is the entry point for the Project Initiator toolchain.
+
+Two flows:
+- **New project:** guided setup — asks client name, engagement name, project type,
+  confirms before creating folder structure, writes project.md + session_state.md
+- **Resume:** scans for active engagements, displays registry with stage + last session date,
+  routes consultant to next step
+
+Run from `~/fiftyfive-engagements/` (parent directory) for full registry.
+Run from inside a client folder (shortcut) to resume that specific engagement directly.
+
+V1.2 scope: this skill only. No auto-routing between skills — consultant still invokes
+each skill manually. START tells them which one is next.
+
+---
+
+## Pre-flight
+
+Before asking anything, silently:
+
+1. Run `basename "$PWD"` via Bash tool.
+2. Use Read tool to check if `project.md` exists in the current directory.
+   - If yes: this is an engagement folder → go to **Resume Single Engagement**.
+   - If no: this is the parent directory → continue.
+3. Scan for engagement folders: run `ls -d */` via Bash (ignore errors if no subdirs).
+   - For each subdirectory found, attempt Read on `<subdir>/project.md`.
+   - Build registry list in memory from all successfully read project.md files.
+4. If registry list is empty → go directly to **New Project Flow** (skip main menu).
+5. If registry list has entries → show **Main Menu**.
+
+---
+
+## Main Menu
+
+```
+Active engagements:
+1. RetailEdge (FreshMart) — PWA — ARCH_PROPOSER complete — 2026-06-04
+2. SupplySync (LogiCo) — Web — MVP_SYNTHESIZER complete — 2026-05-30
+3. VectorSeven (VectorSeven Inc) — Enterprise — DISCOVERY complete — 2026-05-22
+
+Which? (1 / 2 / 3) or N for new project
+```
+
+Sort by Last session date, most recent first.
+
+---
+
+## New Project Flow
+
+Ask one at a time:
+
+```
+Client name?
+```
+```
+Engagement / project name?
+```
+```
+Project type? (web / mobile / PWA / enterprise / hybrid)
+```
+
+Slug rule: take engagement name, lowercase, spaces → hyphens, remove special characters.
+Examples: "RetailEdge" → `retailedge` | "Vector Seven" → `vector-seven` | "StyleMart" → `stylemart`
+
+Show confirmation before any filesystem action:
+```
+About to create:
+  ~/fiftyfive-engagements/retailedge/
+  ~/fiftyfive-engagements/retailedge/input/
+  ~/fiftyfive-engagements/retailedge/project.md
+  ~/fiftyfive-engagements/retailedge/session_state.md
+
+Confirm? (yes / no)
+```
+
+On "no" or any negative response:
+```
+Cancelled — no folders created.
+```
+
+On "yes":
+1. Run via Bash: `mkdir -p ~/fiftyfive-engagements/<slug>/input`
+2. Write `~/fiftyfive-engagements/<slug>/project.md`:
+
+```markdown
+# Project — <engagement name>
+Client: <client name>
+Type: <type>
+Started: <YYYY-MM-DD>
+Stage: not started
+Last session: <YYYY-MM-DD>
+```
+
+3. Write `~/fiftyfive-engagements/<slug>/session_state.md`:
+
+```markdown
+# Session State — <engagement name>
+# Updated: <YYYY-MM-DD>
+
+## Current Stage
+Last completed: none
+Status: not started
+
+## Next Step
+Run: DISCOVERY
+From: ~/fiftyfive-engagements/<slug>/
+
+## Open Items
+(none)
+
+## Notes
+```
+
+Output:
+```
+Created: ~/fiftyfive-engagements/<slug>/
+
+Drop raw engagement docs in ~/fiftyfive-engagements/<slug>/input/
+Then open Claude Code in ~/fiftyfive-engagements/<slug>/ and say: run DISCOVERY
+```
+
+---
+
+## Resume Flow
+
+On consultant selecting a number from the main menu:
+
+1. Read `session_state.md` from the selected engagement folder.
+2. Output:
+
+```
+<Engagement Name> — <Stage>
+Open Claude Code in ~/fiftyfive-engagements/<slug>/ and run <Next Step>.
+
+Open items from last session:
+- <item 1>
+- <item 2>
+```
+If Open Items is empty: show "None."
+
+---
+
+## Resume Single Engagement
+
+If pre-flight found `project.md` in current directory:
+
+1. Read `project.md` — get engagement name and stage.
+2. Read `session_state.md` if present.
+3. Output same format as Resume Flow above.
+4. If `session_state.md` missing: show stage from project.md + next skill suggestion.
+
+Next skill by stage:
+- `not started` → DISCOVERY
+- `DISCOVERY complete` → MVP_SYNTHESIZER
+- `MVP_SYNTHESIZER complete` → ARCH_PROPOSER
+- `ARCH_PROPOSER complete` → DOC_GENERATOR (not yet built — V1.3.5)
+- `DOC_GENERATOR complete` → BACKLOG_GENERATOR (not yet built — V1.4)
+
+---
+
+## Stage Auto-detection
+
+If a subdirectory has no `project.md` but contains skill output files:
+
+Detect stage from files present (check in order — stop at first match):
+- `arch.md` present → `ARCH_PROPOSER complete`
+- `mvp-scope.md` present → `MVP_SYNTHESIZER complete`
+- `discovery.md` present → `DISCOVERY complete`
+- None of the above → `not started`
+
+Ask consultant before writing project.md retroactively:
+```
+Found existing engagement folder: supplysync/
+Stage detected: MVP_SYNTHESIZER complete (mvp-scope.md present)
+
+Client name for this engagement?
+Project type? (web / mobile / PWA / enterprise / hybrid)
+```
+
+Show confirmation with full path, then write `project.md` with confirmed details + detected stage + today's date for Last session.
+
+---
+
+## Rules for this skill
+
+1. Never create folders or files without explicit human confirmation — show full paths first.
+2. Never modify discovery.md, mvp-scope.md, arch.md, or any skill output file.
+3. Slug: lowercase, hyphens only, no special characters, derived from engagement name.
+4. If no engagement folders found: skip main menu, go directly to new project flow.
+5. Stage auto-detection runs if project.md missing — never silently assume stage.
+6. LAYER_0_GLOBAL Rule 4 output limits and Rule 5 (no narration) apply.

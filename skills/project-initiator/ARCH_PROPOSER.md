@@ -86,3 +86,83 @@ all BLOCKs resolved or deferred.
 **Timeline WARN + sprint mapping:** If Timeline is WARN and consultant doesn't resolve it
 at gate, ask for a date before the Build Order section — sprint mapping without a deadline
 produces noise, not a plan.
+
+---
+
+## Stack Selection
+
+### Step 1 — Show confirmed tech
+Pull confirmed tech from `## Constraints → Tech:` in mvp-scope.md. Display as locked:
+```
+Already confirmed from mvp-scope.md:
+- Frontend: React ✓
+- Cloud: Azure ✓
+```
+
+### Step 2 — Present options for unconfirmed layers
+For each unconfirmed layer, present 2–3 options from the preferred list, filtered by
+constraints (budget, existing infra, integrations). One layer at a time.
+
+Consultant can pick A/B/C or propose their own option. If they propose one outside the
+preferred list, confirm it and apply a STRAWMAN marker.
+
+Format:
+```
+Backend:
+A) Node.js + Express — lightweight, same language as React frontend, large Azure ecosystem
+B) .NET Core — strong Azure-native, better for legacy POS integration, heavier initial setup
+C) FastAPI (Python) — fast to prototype, good for data-heavy dashboards, separate language
+
+Recommendation: A — fits budget and timeline; B only if Oracle POS SDK is .NET-specific.
+Which? (A / B / C)
+```
+
+Present layers in this order: backend → database → infra → mobile (only if Mobile App is IN scope).
+
+### Preferred stack list (fiftyfive-tech defaults)
+
+| Layer | Options |
+|---|---|
+| Frontend | React, Vue.js, Next.js |
+| Backend | Node.js + Express, .NET Core, FastAPI |
+| Database | PostgreSQL, Azure SQL, Cosmos DB |
+| Infra | Azure App Service, Azure Container Apps, AKS |
+| Mobile | React Native, Flutter (only when Mobile App is IN scope) |
+
+### Step 3 — STRAWMAN markers
+Any stack decision that is a close call, tentative, or derived from MED/LOW confidence
+source in mvp-scope.md → flag `[STRAWMAN]` in arch.md Tech Stack table.
+
+---
+
+## Component Design
+
+For each feature in `## Scope: In`, silently derive components from the confirmed stack.
+Present as a single block:
+
+```
+Proposed components for Sales Dashboard:
+- DashboardUI (React) — store/date/category filters + chart views
+- SalesAPI (Node.js) — /sales/summary, /sales/by-store, /sales/by-category
+- SalesAggregator — scheduled job: aggregates raw POS data → summary tables
+- OracleConnector — reads from Oracle Retail POS (shared)
+
+Proposed components for Inventory Alerts:
+- AlertsUI (React) — low-stock/expiry alert feed per store
+- AlertsAPI (Node.js) — /alerts/active, /alerts/dismiss
+- AlertEngine — scheduled job: evaluates SKU thresholds → writes alert records
+- (reuses OracleConnector — shared)
+
+**Shared component:** OracleConnector — used by [Sales Dashboard, Inventory Alerts].
+Built once in Sprint 1 before either feature's API layer.
+
+Data model hints:
+- `sales_summary` — store_id, date, category_id, total_sales, units_sold
+- `inventory_alerts` — sku_id, store_id, alert_type (low_stock|expiry), triggered_at, dismissed_at
+- `oracle_sync_log` — sync_id, synced_at, status, records_processed
+
+Any components to add, rename, split, or remove?
+```
+
+One confirmation prompt. Consultant can edit freely. ARCH_PROPOSER re-shows affected
+section after changes. Shared components flagged inline and in `arch.md ## Components`.

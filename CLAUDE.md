@@ -46,7 +46,7 @@ ai-ops/
 | PI V1.1 | MVP_SYNTHESIZER skill — readiness gate + mvp-scope.md | Done |
 | PI V1.2 | START skill + SESSION_STATE integration | Done |
 | PI V1.3 | ARCH_PROPOSER skill — built, tested on 2 synthetic fixtures (49/49 + 17/17) | Done |
-| PI V1.3.5 | DOC_GENERATOR skill | Not started |
+| PI V1.3.5 | DOC_GENERATOR skill — built, tested on 2 synthetic fixtures (56/56 + 22/22) | Done |
 | PI V1.4 | BACKLOG_GENERATOR | Not started |
 
 ---
@@ -210,6 +210,20 @@ Design spec: `docs/superpowers/specs/2026-06-04-mvp-synthesizer-design.md`
 
 Test fixtures: `tests/fixtures/arch-proposer/synthetic-01/` (SupplySync PASS-path, 49/49), `tests/fixtures/arch-proposer/synthetic-02/` (RetailEdge BLOCK-path, 17/17)
 
+### DOC_GENERATOR (V1.3.5 — done)
+
+Skill location: `skills/project-initiator/DOC_GENERATOR.md`
+
+**How to run:** Open Claude Code in the `<client-name>/` folder (with `discovery.md`, `mvp-scope.md`, and `arch.md` present). Say `run DOC_GENERATOR`. Runs sync check, presents menu, generates selected docs with Mermaid diagrams. Saves to `docs/` subfolder.
+
+**Sync Check:** runs before the menu. Cross-validates all 3 input files for consistency. DRIFT items block the menu until resolved or deferred. WARNs pass through and are flagged in affected docs.
+
+**Documents generated:** Project Proposal/SOW, Technical Architecture Doc, Sprint Plan, Developer Handoff Doc, Scope Agreement — each saved to `<engagement-folder>/docs/`.
+
+Design spec: `docs/superpowers/specs/2026-06-04-doc-generator-design.md`
+
+Test fixtures: `tests/fixtures/doc-generator/synthetic-01/` (RetailEdge PASS-path, 56/56), `tests/fixtures/doc-generator/synthetic-02-drift/` (RetailEdge DRIFT-path, 22/22)
+
 ### START (V1.2 — done)
 
 Skill location: `skills/project-initiator/START.md`
@@ -225,7 +239,7 @@ Test fixtures: `tests/fixtures/start/synthetic-new/` (new project path, 18/18), 
 
 ### Chain status
 
-START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (V1.3.5, not started) → BACKLOG_GENERATOR (V1.4, not started) → ROADMAP (future)
+START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (V1.4, not started) → ROADMAP (future)
 
 Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), now in progress with START skill.
 

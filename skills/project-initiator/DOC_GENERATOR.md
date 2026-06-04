@@ -414,3 +414,290 @@ All tentative decisions — verify before dev Sprint 1:
 ```
 
 ---
+
+### Doc 3 — Sprint Plan [Dev team + PM]
+
+Generate the full document using this structure:
+
+```
+# Sprint Plan — <engagement name>
+**Prepared by:** fiftyfive technologies
+**Date:** <current date>
+**Source:** arch.md Sprint Mapping
+
+---
+
+## Team
+<From arch.md ## Sprint Mapping → Team line. Format: role + seniority per person.>
+
+---
+
+## Sprint Calendar
+
+<Mermaid Gantt. Source: arch.md ## Sprint Mapping table.
+Each sprint gets a bar. Each owner gets a separate section/row where possible.
+Label bars with the primary deliverable for that sprint, not component names.>
+
+```gantt
+    title Sprint Plan — <engagement name>
+    dateFormat  YYYY-MM-DD
+    section <Owner 1>
+        <Deliverable> : <start>, <end>
+    section <Owner 2>
+        <Deliverable> : <start>, <end>
+```
+
+---
+
+## Sprint Breakdown
+
+| Sprint | Dates | Deliverables | Owner |
+|---|---|---|---|
+<One row per sprint from arch.md ## Sprint Mapping table.
+Derive sprint start/end dates from the timeline and sprint length (default 2 weeks).
+First sprint starts on the timeline start date from mvp-scope.md.>
+
+---
+
+## Dependency Map
+
+| Component / Deliverable | Must complete before |
+|---|---|
+<For each item in arch.md ## Build Order: what does it unblock?
+Derived from the ordered list — item N unblocks item N+1 where a dependency exists.>
+
+---
+
+## Risk Flags
+
+| Sprint | STRAWMAN Risk | Impact if unresolved |
+|---|---|---|
+<For each [STRAWMAN] in arch.md ## STRAWMAN Summary: identify which sprint is affected.
+State the business impact of the risk (e.g. "Sprint 1-2 scope may expand if integration
+method requires custom extraction work"). No technical jargon in the Impact column.>
+```
+
+---
+
+### Doc 4 — Developer Handoff Doc [Dev team]
+
+Generate the full document using this structure:
+
+```
+# Developer Handoff — <engagement name>
+**Prepared by:** fiftyfive technologies
+**Date:** <current date>
+**For:** Development team onboarding
+
+---
+
+## Engagement Context
+<3-4 sentences. Source: discovery.md core problem + mvp-scope.md users + arch.md client summary.
+Goal: orient a new developer who has never seen this project before.>
+
+---
+
+## Tech Stack
+<From arch.md ## Tech Stack — verbatim including [STRAWMAN] flags.>
+
+---
+
+## Component Inventory
+
+<For each component in arch.md ## Components, one subsection:>
+
+### <ComponentName>
+- **Tech:** <technology>
+- **Purpose:** <one-line description>
+- **Depends on:** <other components or "none">
+- **Shared by:** <features that use this component, or "not shared">
+- **Open Questions:** <any Open Questions from arch.md that block this component, or "none">
+
+---
+
+## Data Model
+
+<Mermaid erDiagram — same as Doc 2. Repeat in full — engineer may read this doc without Tech Arch.>
+
+```mermaid
+erDiagram
+    TABLE_A {
+        type field1
+        type field2
+    }
+    TABLE_B {
+        type field1
+    }
+    TABLE_A ||--o{ TABLE_B : "relationship label"
+```
+
+---
+
+## Integration Flows
+
+<For each row in arch.md ## Integration Points: one Mermaid flowchart showing the data flow
+for that integration. Include the proposed approach and flag risk level.>
+
+**<Integration name>** — Risk: <level>
+
+```mermaid
+flowchart LR
+    App["Application"] -->|"<action>"| Ext["<External System>"]
+    Ext -->|"<response>"| App
+```
+
+---
+
+## Build Order
+
+<From arch.md ## Build Order — verbatim, with rationale per item.>
+
+---
+
+## Open Questions
+
+<From arch.md ## Open Questions. Mark which component each blocks.>
+
+| # | Question | Blocks |
+|---|---|---|
+<One row per open question.>
+
+---
+
+## STRAWMAN Checklist
+
+Verify all items below before beginning Sprint 1. Each [STRAWMAN] is a tentative decision
+that may change once validated.
+
+<For each item in arch.md ## STRAWMAN Summary:>
+- [ ] <STRAWMAN decision> — <why tentative> — <what would change it>
+```
+
+---
+
+### Doc 5 — Scope Agreement [Client-facing]
+
+Client language throughout. No component names, no framework names.
+
+If DRIFT items were found in the sync check (including deferred ones), include the
+"What Changed Since MVP Scope" section. Omit it if no DRIFT was found.
+
+Generate the full document using this structure:
+
+```
+# Scope Agreement — <engagement name>
+**Client:** <client/company name from discovery.md>
+**Prepared by:** fiftyfive technologies
+**Date:** <current date>
+**Status:** Pending client sign-off
+
+---
+
+## 1. Problem Statement
+<From mvp-scope.md ## Problem Restatement — lightly reworded for client audience if needed.>
+
+---
+
+## 2. Users
+
+| Role | Usage |
+|---|---|
+<From mvp-scope.md ## Users — Primary and Secondary.>
+
+---
+
+## 3. MVP Scope
+
+### In Scope
+| Capability | Description |
+|---|---|
+<From mvp-scope.md ## Scope: In — features in business terms.>
+
+### Out of Scope (Phase 2)
+| Capability | Reason |
+|---|---|
+<From mvp-scope.md ## Scope: Out.>
+
+---
+
+## 4. Key User Journeys
+<From mvp-scope.md ## Key User Journeys — verbatim.>
+
+---
+
+## 5. Delivery Timeline
+
+<Mermaid Gantt — same milestone structure as Doc 1. Repeat in full — client may receive
+this doc without the Proposal.>
+
+```gantt
+    title Delivery Timeline — <engagement name>
+    dateFormat  YYYY-MM-DD
+    section <Phase 1 label>
+        <milestone> : <start>, <end>
+    section <Phase 2 label>
+        <milestone> : <start>, <end>
+```
+
+---
+
+## 6. Constraints
+
+- **Budget:** <from mvp-scope.md>
+- **Infrastructure:** <from arch.md Tech Stack — infra layer, business terms>
+- **Frontend technology:** <from arch.md Tech Stack — frontend, business terms>
+- **Integrations:** <from mvp-scope.md ## Constraints → Other — business terms>
+- **Timeline:** <from mvp-scope.md>
+
+---
+
+## 7. Assumptions
+
+<From mvp-scope.md ## Assumptions updated with arch-phase assumptions from arch.md ## STRAWMAN Summary.
+Rewrite STRAWMANs as plain assumptions: "It is assumed that [X] is feasible — this will be
+confirmed during Sprint 1."
+Client language — no technical jargon.>
+
+---
+
+## 8. Pre-conditions for Project Start
+
+<From arch.md ## Open Questions — reframe as pre-conditions.
+For items resolved during ARCH_PROPOSER: mark Resolved.
+For items still open: list as outstanding pre-conditions with owner (Client / fiftyfive).>
+
+| # | Pre-condition | Owner | Status |
+|---|---|---|---|
+
+---
+
+## 9. Success Metrics
+<From mvp-scope.md ## Success Metrics.>
+
+[ONLY INCLUDE THIS SECTION IF DRIFT ITEMS WERE FOUND IN SYNC CHECK]
+## 10. What Changed Since MVP Scope
+
+<For each DRIFT item found (including deferred ones):>
+- **<Area>:** During the architecture phase, <what changed and why>. <Resolution or "pending confirmation before Sprint 1.">.
+
+[END CONDITIONAL SECTION]
+
+---
+
+## <10 or 11>. Sign-Off
+
+By signing below, both parties confirm that the scope described in this document is agreed
+and that work will not commence until pre-conditions in Section 8 are resolved.
+
+| | |
+|---|---|
+| **<Client company name>** | |
+| Name: | __________________ |
+| Title: | __________________ |
+| Date: | __________________ |
+| | |
+| **fiftyfive technologies** | |
+| Name: | __________________ |
+| Title: | __________________ |
+| Date: | __________________ |
+```

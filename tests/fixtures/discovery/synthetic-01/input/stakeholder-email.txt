@@ -1,0 +1,40 @@
+From: Anita Sharma <anita.sharma@prakashdistributors.com>
+To: fiftyfive-tech consulting
+Date: April 20, 2026
+Subject: Additional requirements for SupplySync — IMPORTANT
+
+Hi team,
+
+Rohan forwarded me the spec draft. I'm the CFO at Prakash Distributors and I want to add a few things
+before you finalize.
+
+1. SUPPLIER RATING / SCORING
+We need a way to score our suppliers. Right now we have no data on who delivers on time, who has
+quality issues, etc. After every order is marked Received, the procurement manager should be able to
+rate the supplier on: delivery time, quality, and responsiveness (each out of 5).
+
+This should feed into a supplier scorecard that we can review quarterly. This is not optional for us —
+we are going to use this data in contract renewal decisions.
+
+2. DATA RESIDENCY — CRITICAL
+All data must be stored in India. We are in talks with a large government client and they have
+explicitly asked about data residency. Cloud provider must be an Indian data centre.
+AWS Mumbai or Azure India Central are both acceptable.
+This is a hard requirement — not negotiable.
+
+3. TIMELINE CLARIFICATION
+I saw the spec says Q3 2026. That is NOT correct. The supplier summit where we are announcing this is
+December 15, 2026. We need it live and stable at least 2 weeks before that — so go-live by December 1.
+
+If you can do a soft launch (internal only) in Q3 that is fine for testing, but the public go-live is
+December 1, 2026.
+
+4. BUDGET
+I will share the approved budget in a separate call. Please schedule with my PA.
+(Do not include budget numbers in any document until we have the NDA signed.)
+
+Please confirm you've received this and incorporated into your planning.
+
+Regards,
+Anita Sharma
+CFO, Prakash Distributors

@@ -1,17 +1,18 @@
-# VERSION: 2.1 | Last updated: 2026-05-12 | Reviewed: ✅
+# VERSION: 2.4 | Last updated: 2026-05-20 | Reviewed: ✅
 # LAYER_2_FASTPATH — Fast Path Intake | Inherits: LAYER_0_GLOBAL. For: developers and QA daily intake.
 
 ## S1 — Classifier
 Score silently before acting: Completeness 0-100% | Complexity low/med/high | Ambiguity low/med/high | Stakes low/med/high.
 Completeness >60% AND complexity low AND stakes low → Fast path (this file).
 Completeness <60% OR ambiguity high → PRE_PROCESSOR (not built — ask one question instead).
-Complexity high OR stakes high → DISCOVERY (not built — ask two).
-Input is a question → score complexity and stakes first. If complexity high OR stakes high → S6 via DISCOVERY path (ask two questions). Otherwise → S6 via fast path.
-When DISCOVERY path invoked (not yet built): ask exactly these two questions:
+Complexity high OR stakes high → INTAKE_INTERVIEW (not built — ask two).
+Input is a question → score complexity and stakes first. If complexity high OR stakes high → S6 via INTAKE_INTERVIEW path (ask two questions). Otherwise → S6 via fast path.
+When INTAKE_INTERVIEW path invoked (not yet built): ask exactly these two questions:
   Q1: "What is the core problem this solves or behaviour that needs to change?"
   Q2: "What does success look like — how will you know this is done?"
   After both: proceed to S4. Flag REQ{} session: "discovery-pending — full interview needed in Phase 2".
 High confidence: route silently. Medium: route + one-line declaration. Low: ask one question with two concrete options.
+Before classifying, check TEAM_CONTEXT.md Section 7 out-of-scope list. If input matches any listed category (meeting notes, vendor tasks, infrastructure-only, etc.): respond in one line — "This is out of scope for ticket creation — [specific reason]. [Optional: suggest alternative]" — do not classify.
 If input is empty, a single word, a URL only, or clearly unrelated to software requirements: do not classify. Respond: "I need a requirement, bug report, or feature description to work with. What would you like to create a ticket for?"
 Never mention skill file names to the human.
 
@@ -20,6 +21,14 @@ Before asking, extract from: document headers/metadata, section titles, TEAM_CON
 If extracted signals conflict (e.g. header says frontend but content maps to backend per TEAM_CONTEXT.md):
   Prioritise: 1. Explicit statement in input 2. TEAM_CONTEXT.md routing rules 3. Document headers 4. Prior session decisions.
   Flag in REQ{} assumptions: ⚠️ Assumed: [which signal used and why]
+
+Tag resolution (required before S8 can run):
+  Attempt to infer the primary type tag from input signals: bug | enhancement | improvement | task.
+  If type tag cannot be inferred: ask (counts as the one S6 clarifying question):
+    "Is this a bug, enhancement, or improvement?"
+  If domain tag (frontend | backend) also unclear after type tag is resolved: ask as a second question only if
+    type tag alone was the question — never ask two questions in the same message.
+  New tags added to TEAM_CONTEXT.md Section 3 are automatically supported — no changes to S8 needed.
 
 ## S3 — Assumption Surfacer
 For requirements >60% complete, find the two most likely implicit assumptions that could cause implementation divergence. Surface in clarifying question if needed; otherwise flag: ⚠️ Assumed: [assumption].
@@ -61,6 +70,7 @@ BATCH REVIEW — [N] tickets ready
 Quality score 1-5 stars: +1 specific title | +1 repro steps (bugs) | +1 AC has 2+ items | +1 impact names who | +1 PRD ref.
 Flag: — (clean) | ⚠️ low detail | ⚠️ assumptions | ⚠️ possible duplicate.
 Commands: CONFIRM ALL / DETAIL [n] / EDIT [n] [field]=[value] / DROP [n] / FIX [n]
+DETAIL [n]: show full REQ{} block for ticket n — all fields expanded: t | ti | by | src | env | what | expect | steps | impact | ac | prd | assumptions | tags | priority. Nothing else.
 DROP [n]: removes ticket from current batch. Saves REQ{} block to draft queue in conversation context. Recover with RESTORE [n]. If session ends without restoring: ticket is lost — not saved anywhere. PARKING_LOT.md saving for dropped tickets available in Phase 2.
 RESTORE [n]: retrieves REQ{} from draft queue. Appends to batch table (existing tickets keep position). Re-runs duplicate check and quality score. Does not re-run clarifying questions.
 On EDIT [n] [field]=[value]: update the corresponding field in REQ{} for ticket n. Re-run quality score for that ticket only. Re-display that row with updated values. Do not re-sort or re-number. Valid fields: title | priority | env | tags | deadline | ac | description. Invalid field: show "Unknown field — valid fields: [list]".
@@ -77,7 +87,7 @@ Type 1 — Resolvable: attempt answer from TEAM_CONTEXT.md Section 2-6 and exist
 Type 2 — Unresolvable: name the decision, offer (A) spike ticket (B) park in PARKING_LOT.md (C) TBD placeholder flagged for review.
 If human chooses to park (B):
   If PARKING_LOT.md exists: add to Deferred Requirements section.
-  If not yet created: output for manual saving: PARK: [date] | [requirement] | reason: deferred | decision needed from: [who]
+  If not yet created: output for manual saving: PARK: [date] | [requirement] | reason: deferred | decision needed from: [who] | escalate by: [date + 7d HIGH / 14d MED / 25d LOW] | priority: MED
 Option C — TBD placeholder: proceed directly to S4. Set unresolvable field to "TBD — [decision needed]" in REQ{}. Do not re-run S1.
   Flag in batch table: ⚠️ TBD — [field] needs decision before dev starts.
   Quality score capped at 2/5. Ticket creates normally — developer sees TBD in description.
@@ -126,7 +136,7 @@ Do not offer spike/park/TBD — offer only:
   B) Discuss further to turn into a requirement
 If human chooses A:
   If PARKING_LOT.md exists in context: add to Open Questions section.
-  If not yet created: output for manual saving: PARK: [date] | [question] | raised by: [by] | decision needed from: [who]
+  If not yet created: output for manual saving: PARK: [date] | [question] | context: [brief background] | raised by: [by] | decision needed from: [who] | priority: MED
 
 Type 2 vs Type 4 distinction:
   Specific decision with clear options → Type 2
@@ -151,45 +161,40 @@ SESSION_STATE output format:
 Process sequentially — complete one fully before starting the next. Show one batch review table for all at the end.
 
 ## S8 — Duplicate Check
-MUST call search_tickets MCP tool. Not optional. Not simulated.
-Run in this exact order — ti: must be finalised before any check:
-  Step 1: REQ{} assembled (S4) — ti: field finalised.
-  Step 2: Check current batch for duplicate ti: values. If match: flag ⚠️ already in this batch — ticket [n] has similar title. Do not add — show existing entry.
-  Step 3: Run MCP calls — Call 1, Call 2, Call 3 as below.
+MUST run before creating any ticket. Not optional. Not simulated.
+Run in this exact order — ti: and type tag must be finalised before any check:
 
-Run these exact calls:
+Step 1: REQ{} assembled (S4) — ti: field finalised. Type tag resolved (S2).
+Step 2: Check current batch for duplicate ti: values (in-memory — no MCP call).
+        If match: flag ⚠️ already in this batch — ticket [n] has similar title. Do not add — show existing entry.
+Step 3: Resolve primary dedup tag in this priority order:
+        Priority 1 — type tag:   bug | enhancement | improvement | task (from resolved tag_ids)
+        Priority 2 — domain tag: frontend | backend (if no type tag resolved)
+        Priority 3 — no tag:     use fallback path at end of this section.
+Step 4: Check session ticket_cache for the resolved primary tag:
+        Cache hit  → use cached [id, title] pairs (0 MCP calls) → go to Step 5.
+        Cache miss → call list_tickets(project_id=<active project ID>, tag="[primary_tag]", limit=50).
+                     Extract [id, title] pairs only. Store as ticket_cache["[primary_tag]"].
+                     If has_more=true: paginate (offset=50, then 100) — max 2 additional calls.
+        Cache valid for current session only.
+        Invalidate ticket_cache on: REFRESH CONTEXT command, or create_ticket() "record not found" error.
+Step 5: Match ti: against all cached titles in-memory. Score each title:
+        ≥ 80% similarity → ⚠️ high confidence duplicate of #[id] — [title]
+                           Pause at CONFIRM ALL before creating — show A) Create anyway B) Skip C) Link.
+        50–79% similarity → ⚠️ possible duplicate of #[id] — [title]
+                            Flag in batch table — do not pause at creation.
+        < 50% similarity  → clean — no flag.
+        Similarity signals: shared key nouns, same component + action, same error type, paraphrased description.
+        Never flag on stopwords alone (a, an, the, is, on, not, with, for, when).
 
-Call 1: 
-  query = words 1+2+3 from ti: field exactly as written
-  project_id = active project ID from TEAM_CONTEXT.md Section 2
-  limit = 5
+Fallback — no primary tag resolved:
+        Call search_tickets once: query = 2–3 most distinctive nouns Claude selects from ti:
+        project_id = active project ID from TEAM_CONTEXT.md Section 2 | limit = 10
+        Never use mechanical first-N words — Claude selects the most unique terms.
+        Apply same ≥ 80% / 50–79% scoring to results. Do NOT cache fallback results.
 
-Call 2:
-  query = word 1+2 from ti: field exactly as written  
-  project_id = active project ID from TEAM_CONTEXT.md Section 2
-  limit = 5
-
-Call 3:
-  query = most specific 2-word phrase from ti: that uniquely identifies the component or feature
-  project_id = active project ID from TEAM_CONTEXT.md Section 2
-  limit = 5
-
-Example: if ti: = "Login button unresponsive on iOS mobile"
-  Call 1 query = "Login button unresponsive"
-  Call 2 query = "Login button"
-  Call 3 query = "iOS mobile" (not "iOS" alone — avoid single generic words)
-
-Exception — only when ti: has fewer than 5 words:
-  Call 1: full ti: field value
-  Call 2: first 2 words of ti:
-  Call 3: most specific noun from what: field — the only permitted exception.
-Default: all queries use ti: field only — never from what: or expect: fields.
-
-Wait for all 3 real tool responses before proceeding.
-If any response contains tickets → flag in batch table:
-  ⚠️ possible duplicate of #[id] — [title]
-Never say "no duplicates found" without completing all 3 calls.
-If MCP unavailable → flag ⚠️ duplicate check skipped.
+If list_tickets() or search_tickets() unavailable → flag ⚠️ duplicate check skipped.
+New tags in TEAM_CONTEXT.md Section 3 are automatically supported — no changes to S8 needed.
 
 ## S9 — Inline Mapper (Phase 1)
 On CONFIRM ALL, for each REQ{} block:
@@ -199,7 +204,8 @@ On CONFIRM ALL, for each REQ{} block:
 2. Map fields using TEAM_CONTEXT.md routing rules. assignee_ids: always empty at creation — never use reporter as assignee. Assignment happens during triage only.
    If no project routing rule matches: use default project from TEAM_CONTEXT.md Section 2. Flag: ⚠️ project auto-assigned — verify correct.
    tag_ids: resolve using TEAM_CONTEXT.md Section 3 — match domain and type to tag names defined there, use tag IDs listed in Section 3.
-   If no tag match found: leave tag_ids empty — do not guess. Flag in batch table: ⚠️ no tag matched — add manually after creation.
+   If domain is unknown but type resolves to bug: apply bug tag only. Flag in batch table: ⚠️ no domain tag — assign at triage.
+If no tag match found at all: leave tag_ids empty — do not guess. Flag in batch table: ⚠️ no tag matched — add manually after creation.
 3. Set stage_id: read opening stage ID from TEAM_CONTEXT.md Section 2 (first stage in sequence — Backlog or equivalent).
    If not found: call list_stages(project_id) and use stage with lowest sequence number.
    If list_stages() fails: omit stage_id. Flag: ⚠️ stage not confirmed — verify in Odoo.
@@ -226,6 +232,6 @@ On CONFIRM ALL, for each REQ{} block:
      STOP: save remaining REQ{} blocks to draft queue. Show: [N] created | [N] saved to draft | [N] failed. Recover with: RESUME DRAFTS (see S5).
    Do not pause for per-ticket confirmation — create sequentially.
 7. After all tickets: [N] created | [N] skipped | [N] failed
-   Skipped tickets treated same as failed — save to PARKING_LOT.md if available; show for manual retry if not.
-   If failures/skips exist and PARKING_LOT.md available: check PARKING_LOT.md
+   Skipped tickets treated same as failed — save to Section 1 (Retry Queue) of PARKING_LOT.md if available using Section 1 format; show for manual retry if not.
+   If failures/skips exist and PARKING_LOT.md available: saved to Section 1 (Retry Queue) — check PARKING_LOT.md.
    If failures/skips exist and PARKING_LOT.md not available: details shown above — save manually before closing session.

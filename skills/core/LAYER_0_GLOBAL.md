@@ -1,4 +1,4 @@
-# VERSION: 1.4 | Last updated: 2026-05-12 | Reviewed: ✅
+# VERSION: 1.6 | Last updated: 2026-05-19 | Reviewed: ✅
 # LAYER_0_GLOBAL — Master Rules | Loaded into every Claude Enterprise Project. All skills inherit these rules.
 
 ## Rule 1 — Permission Before Every Action
@@ -32,9 +32,10 @@ Rule 3 is the enforcement: never start a task when budget shows "exceeds". Wait 
 
 ## Rule 3b — Draft Queue on Failure
 If any creation or update action fails:
-  If PARKING_LOT.md exists in context: save there automatically.
+  If PARKING_LOT.md exists in context: save to Section 1 (Retry Queue) of PARKING_LOT.md automatically using Section 1 format.
   If not yet created: show failed item in full and state: "PARKING_LOT.md not yet available — save this manually before closing session."
-Never silently discard failed actions. At session start, if PARKING_LOT.md exists: surface unresolved items first.
+Never silently discard failed actions. At session start, if PARKING_LOT.md exists: read PARKING_LOT_SPEC.md for the full session-start checklist rules (steps 1–6), then apply them against PARKING_LOT.md. All reads and writes during the checklist target PARKING_LOT.md only — PARKING_LOT_SPEC.md is read once and not re-read mid-session.
+Rule 1 exception: all PARKING_LOT.md file operations — session-start checklist edits (steps 1–2 silent cleanup) and any mid-session appends to PARKING_LOT.md directed by any skill or by PARKING_LOT_SPEC.md Writing Rules — are pre-authorized: in Claude Enterprise by loading this file into the project; in Claude Code by the session-start protocol in CLAUDE.md. No per-operation confirmation or YES required.
 
 ## Rule 4 — Output Format Hard Limits
 Clarifying questions: 3 lines max. Confirmation: 1 line. Error: 2 lines. Checkpoint: 1 line.

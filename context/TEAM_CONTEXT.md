@@ -1,7 +1,7 @@
 # TEAM_CONTEXT — TiffinConnect
 # VERSION: 1.3 | Last reviewed: 2026-05-14 | Lines: 128/200 | Maintained by: Lead
 # Rules: Do not edit Section 5 manually — auto-populated during sessions.
-# When Section 5 hits 30 lines, review and prune before next session.
+# When Section 5 hits 25 lines (per LAYER_0 Rule 8), review and prune before continuing.
 
 ---
 
@@ -96,7 +96,7 @@ Default: when in doubt → normal (0), flag for triage owner to review.
 ## Section 5: Learned Decisions
 Auto-populated by Claude after sessions. Human reviews weekly.
 Format: [date] | decision | confirmed by
-Hard limit: 30 lines. Prune when full.
+Hard limit: 25 lines. Prune when Rule 8 flags it.
 
 Empty — populated during sessions.
 

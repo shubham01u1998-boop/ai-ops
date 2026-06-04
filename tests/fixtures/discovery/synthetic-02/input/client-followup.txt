@@ -1,0 +1,32 @@
+From: Neha Kapoor <neha@kavyafashions.com>
+To: fiftyfive-tech consulting
+Date: April 18, 2026
+Subject: StyleMart — decisions from our side
+
+Hi,
+
+Following up with answers to your open questions. These are final decisions.
+
+1. MULTI-VENDOR — DECIDED: No.
+   StyleMart is Kavya Fashions only. We are not a marketplace.
+   Please remove multi-vendor from scope entirely.
+
+2. MOBILE APP — Both web and app, launched together.
+   Our MD is firm: we want customers to download an app AND access via web.
+   Whatever the tech choice, both must be ready at the same time.
+
+3. LOYALTY POINTS — Confirmed in scope.
+   Rules: earn 1 point per ₹100 spent. Redeem: 100 points = ₹50 discount.
+   Points expire after 12 months of account inactivity.
+
+4. COD — Confirmed essential.
+   We estimate 60–70% of orders will be COD at launch. Design for this.
+
+5. TIMELINE — Soft launch by end of October 2026 (before Diwali, which is October 20).
+   Full launch: Q1 2027 (web + app + full catalog).
+
+6. BUDGET — Priya Sharma (CFO) will share approved numbers separately.
+   Do not include budget figures in any shared document until NDA is signed.
+
+— Neha Kapoor
+Head of Marketing, Kavya Fashions Pvt Ltd

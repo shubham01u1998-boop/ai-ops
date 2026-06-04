@@ -1,0 +1,41 @@
+PROJECT BRIEF — StyleMart
+Client: Kavya Fashions Pvt Ltd
+Prepared by: fiftyfive-tech (internal)
+Date: April 10, 2026
+
+OVERVIEW
+Kavya Fashions requires a branded e-commerce platform to move sales online.
+Platform: Web application (desktop + mobile-responsive).
+Native mobile app: Phase 2 — NOT in scope for this engagement.
+Brand scope: Single brand only (Kavya Fashions products).
+
+PRIMARY USERS
+- End customers: browse, purchase, track orders
+- Store admin (Kavya Fashions staff): manage inventory, process orders, handle returns
+- Delivery partner staff: update order delivery status
+
+CORE FEATURES
+1. Product catalog with categories, search, filters, size guides
+2. Shopping cart and checkout
+3. Order tracking (real-time status)
+4. Customer accounts with order history
+5. Returns and exchange management
+6. Admin dashboard (products, orders, inventory)
+7. Notifications — email and SMS
+
+PAYMENTS
+Modes required: UPI, credit/debit cards, net banking.
+COD: to be confirmed — return rate implications to assess before committing.
+Payment gateway: TBD.
+
+TECH STACK
+Shopify preferred — faster to market, lower initial cost, built-in payment handling.
+
+TIMELINE
+Soft launch (limited catalog, internal): Q3 2026 (July–September).
+Full public launch: Q1 2027.
+
+OUT OF SCOPE — PHASE 1
+- Native mobile app
+- Multi-vendor / marketplace functionality
+- Tally / ERP integration

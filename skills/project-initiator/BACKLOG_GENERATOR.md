@@ -121,3 +121,71 @@ If not found: `create_project(name=<project_name>, stages=[<stage_list>])`
 create one Odoo tag per sprint label via `create_tag`. Store sprint label → tag_id map.
 
 ---
+
+## Team Mapping
+
+After project creation, show the team roster extracted from `## Sprint Mapping`:
+
+```
+Team roles from arch.md:
+
+  Role           | arch.md name   | Odoo user ID
+  ---------------|----------------|-------------
+  BE-senior      | (name)         | ?
+  BE-junior      | (name)         | ?
+  FE-senior      | (name)         | ?
+  FE-junior      | (name)         | ?
+  QA             | (name)         | ?
+
+Enter Odoo user ID for each role, or type "skip" to leave unassigned.
+Note: the person must have an Odoo account to be assigned tickets.
+```
+
+Store completed role → assignee_id map. Roles marked "skip" → `assignee_ids: []`.
+
+Do not ask again. If a role appears in multiple sprints, the same mapping applies throughout.
+
+---
+
+## Duplicate Check
+
+Runs before the preview gate — always, regardless of new vs existing project.
+
+Call `list_tickets(project_id=<project_id>, limit=100)`.
+Compare each generated ticket title (case-insensitive, exact match) against existing titles.
+
+If duplicates found:
+```
+⚠ Duplicate check: <N> tickets already exist with matching titles:
+  - "[Sprint 1-2] OracleConnector" — matches existing ticket #<id>
+  - "[Sprint 3-4] SalesAPI + AlertEngine" — matches existing ticket #<id>
+
+  [A] Skip duplicates (create only new tickets)
+  [B] Cancel — do not create anything
+  [C] Create anyway — will produce duplicates in Odoo
+```
+Consultant must explicitly respond before the preview table is shown.
+
+**Preview table:** Duplicate-matched titles are marked `[EXISTS]` in the table even after
+[A] is chosen, so the consultant sees what was skipped.
+
+If no duplicates found: proceed silently to preview.
+
+---
+
+## Ticket Type Inference
+
+Infer ticket type from the component's tech annotation in `## Components` and the confirmed
+tech in `## Tech Stack`.
+
+| Component tech annotation | Ticket type | Auto-tag |
+|---|---|---|
+| React, Vue, Next.js, Flutter, React Native | frontend | `frontend` (tag ID 2) |
+| Node.js, Express, .NET Core, FastAPI, Python | backend | `backend` (tag ID 44) |
+| Azure App Service, AKS, Container Apps | backend | `backend` (tag ID 44) |
+| Shared, connector, aggregator, job, worker | backend | `backend` (tag ID 44) |
+
+If type cannot be determined: default to backend. Flag inline in preview:
+`[type inferred — verify]`.
+
+---

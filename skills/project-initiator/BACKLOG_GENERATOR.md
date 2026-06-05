@@ -150,7 +150,7 @@ Do not ask again. If a role appears in multiple sprints, the same mapping applie
 
 Runs before the preview gate — always, regardless of new vs existing project.
 
-At this point, all parent and STRAWMAN ticket titles have been generated internally using the Ticket Structure and STRAWMAN Tickets sections below. Run this check against that internal title list before showing the preview.
+At this point, all parent ticket titles (one per Build Order item, formatted as `[Sprint X-Y] <item name>`) and STRAWMAN ticket titles (`⚠ STRAWMAN: Verify <decision> before Sprint 1`) have been generated internally. Run this check against that internal title list before showing the preview.
 
 Call `list_tickets(project_id=<project_id>, limit=100)`.
 Compare each generated ticket title (case-insensitive, exact match) against existing titles.

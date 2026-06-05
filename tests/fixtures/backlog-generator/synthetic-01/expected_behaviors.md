@@ -43,13 +43,13 @@
 - [ ] BG-26: SalesAggregator (Node.js) → backend → tag_id 44
 - [ ] BG-27: SalesAPI + AlertEngine (Node.js) → backend → tag_id 44
 - [ ] BG-28: DashboardUI + AlertsUI (React) → frontend → tag_id 2
-- [ ] BG-29: Offline mode (Service Worker) → backend → tag_id 44
+- [ ] BG-29: Offline mode (Service Worker) → backend → tag_id 44; preview shows `[type inferred — verify]` flag
 
 ## Ticket Structure
 
 - [ ] BG-30: 5 parent tickets generated (one per Build Order item)
 - [ ] BG-31: Ticket 1 title: `[Sprint 1-2] OracleConnector`
-- [ ] BG-32: Ticket 1 deadline = Sprint 1-2 end date computed from Sprint Mapping timeline
+- [ ] BG-32: Ticket 1 deadline = 2026-07-02 (Sprint 1-2 end: start 2026-06-04 + 2 × 2-week sprints)
 - [ ] BG-33: Ticket 1 assignee = BE-senior Odoo ID
 - [ ] BG-34: Ticket 1 tag_ids = [44 (backend), <Sprint 1-2 tag_id>]
 - [ ] BG-35: Ticket 1 priority = "0" (OracleConnector is L effort, not XL)

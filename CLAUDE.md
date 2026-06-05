@@ -47,7 +47,7 @@ ai-ops/
 | PI V1.2 | START skill + SESSION_STATE integration | Done |
 | PI V1.3 | ARCH_PROPOSER skill — built, tested on 2 synthetic fixtures (49/49 + 17/17) | Done |
 | PI V1.3.5 | DOC_GENERATOR skill — built, tested on 2 synthetic fixtures (56/56 + 22/22) | Done |
-| PI V1.4 | BACKLOG_GENERATOR | Not started |
+| PI V1.4 | BACKLOG_GENERATOR skill — built, tested on 2 synthetic fixtures (72/72 + 22/22) | Done |
 
 ---
 
@@ -224,6 +224,31 @@ Design spec: `docs/superpowers/specs/2026-06-04-doc-generator-design.md`
 
 Test fixtures: `tests/fixtures/doc-generator/synthetic-01/` (RetailEdge PASS-path, 56/56), `tests/fixtures/doc-generator/synthetic-02-drift/` (RetailEdge DRIFT-path, 22/22)
 
+### BACKLOG_GENERATOR (V1.4 — done)
+
+Skill location: `skills/project-initiator/BACKLOG_GENERATOR.md`
+
+**How to run:** Open Claude Code in the `<client-name>/` folder (with `arch.md` present).
+Say `run BACKLOG_GENERATOR`. Creates Odoo project + stages, maps team roles, generates
+structured ticket hierarchy, bulk-creates via MCP.
+
+**Project Setup:** Asks for project name (defaults to folder name) and stages (defaults to
+Backlog/To Do/In Progress/Bug/Done). Custom stages trigger purpose-mapping questions.
+
+**Ticket format:** Parent ticket per Build Order item, subtasks per component. Backend tickets
+get API endpoint tables (or Interfaces section for connectors/jobs); frontend tickets get
+screen/component lists. Both include business rules, acceptance criteria, edge cases, and
+relevant Open Questions.
+
+**Duplicate check:** Always runs `list_tickets` before creation. Warns on matches, asks approval.
+
+**Sprint tags:** Creates one Odoo tag per sprint label; every ticket tagged with its sprint.
+
+Design spec: `docs/superpowers/specs/2026-06-04-backlog-generator-design.md`
+
+Test fixtures: `tests/fixtures/backlog-generator/synthetic-01/` (72/72),
+`tests/fixtures/backlog-generator/synthetic-02-duplicate/` (22/22)
+
 ### START (V1.2 — done)
 
 Skill location: `skills/project-initiator/START.md`
@@ -239,7 +264,7 @@ Test fixtures: `tests/fixtures/start/synthetic-new/` (new project path, 18/18), 
 
 ### Chain status
 
-START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (V1.4, not started) → ROADMAP (future)
+START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (done) → ROADMAP (future)
 
 Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), now in progress with START skill.
 

@@ -301,3 +301,215 @@ description only: `(reuses <ComponentName> — built in Sprint N)`.
 Do not create duplicate subtasks for the same shared component.
 
 ---
+
+## STRAWMAN Tickets
+
+After all Build Order tickets are generated, create one ticket per item in `## STRAWMAN Summary`.
+
+| Field | Value |
+|---|---|
+| Title | `⚠ STRAWMAN: Verify <decision> before Sprint 1` |
+| Stage | Backlog equivalent (pre-condition, not ready-to-dev) |
+| Tags | None (no type tag, no sprint tag) |
+| Assignee | blank — triage owner assigns |
+| Deadline | Sprint 1 start date from `## Sprint Mapping` |
+| Priority | `"1"` (high) — these block Sprint 1 start |
+
+STRAWMAN ticket description format:
+
+```markdown
+## Decision
+<what the STRAWMAN decision is>
+
+## Why Tentative
+<rationale from arch.md ## STRAWMAN Summary>
+
+## What Resolves This
+<condition that would confirm or change this decision>
+
+## Impact if Wrong
+<which components or sprints are affected>
+```
+
+---
+
+## Preview + Approval Gate
+
+Before any MCP create call, run the Duplicate Check, then show the full ticket set:
+
+```
+Ticket preview — <engagement name> (<N> tickets + <M> STRAWMAN tickets):
+
+Parent tickets:
+| # | Title                                  | Type     | Sprint | Assignee      | Stage  |
+|---|----------------------------------------|----------|--------|---------------|--------|
+| 1 | [Sprint 1-2] OracleConnector           | Backend  | 1-2    | Sahil         | To Do  |
+|   | ↳ OracleConnector (Node.js)            |          |        |               |        |
+| 2 | [Sprint 1-2] SalesAggregator + data model | Backend | 1-2   | Vijay         | To Do  |
+|   | ↳ SalesAggregator (Node.js)            |          |        |               |        |
+| 3 | [Sprint 3-4] SalesAPI + AlertEngine    | Backend  | 3-4    | Sahil         | To Do  |
+|   | ↳ SalesAPI (Node.js)                   |          |        |               |        |
+|   | ↳ AlertEngine (Node.js)                |          |        |               |        |
+|   |   (reuses OracleConnector — Sprint 1-2)|          |        |               |        |
+| 4 | [Sprint 5] DashboardUI + AlertsUI      | Frontend | 5      | FE-senior     | To Do  |
+|   | ↳ DashboardUI (React)                  |          |        |               |        |
+|   | ↳ AlertsUI (React)                     |          |        |               |        |
+| 5 | [Sprint 6] Offline mode layer          | Backend  | 6      | FE-senior     | To Do  |
+|   | ↳ Offline mode (Service Worker)        |          |        |               |        |
+
+STRAWMAN tickets (5):
+|   | ⚠ STRAWMAN: Verify PostgreSQL...       | —        | —      | (unassigned)  | Backlog|
+|   | ⚠ STRAWMAN: Verify Oracle POS method...| —        | —      | (unassigned)  | Backlog|
+...
+
+Create these <N> tickets in Odoo? [A] Yes / [B] Edit / [C] Cancel
+```
+
+Adapt the example table to the actual engagement's Build Order and team mapping.
+
+**Natural-language handling:**
+- Clear approval ("yes", "create them", "looks good") → [A]
+- Edit request ("change sprint 5 ticket assignee to Tanu") → [B], apply, re-show table
+- "cancel" or "stop" → [C], do not create anything
+
+Per LAYER_0_GLOBAL Rule 1: this prompt is the permission gate. Do not write to Odoo
+until the consultant explicitly approves.
+
+---
+
+## Bulk Creation
+
+On approval:
+
+1. Call `bulk_create_tickets` for all parent tickets:
+```
+bulk_create_tickets(
+  project_id=<id>,
+  tickets=[
+    {
+      "title": "[Sprint 1-2] OracleConnector",
+      "description": "<formatted markdown per Ticket Structure>",
+      "stage_id": <To Do equivalent id>,
+      "assignee_ids": [<id from team mapping>],
+      "tag_ids": [44, <sprint-1-2-tag-id>],
+      "priority": "0",
+      "deadline": "<sprint end date>"
+    },
+    ...
+  ]
+)
+```
+
+2. For each parent ticket returned: call `add_subtasks` with that ticket's subtask list:
+```
+add_subtasks(ticket_id=<parent_id>, subtasks=["OracleConnector (Node.js)", ...])
+```
+
+3. Call `bulk_create_tickets` separately for STRAWMAN tickets (different stage):
+```
+bulk_create_tickets(
+  project_id=<id>,
+  tickets=[
+    {
+      "title": "⚠ STRAWMAN: Verify PostgreSQL before Sprint 1",
+      "description": "<STRAWMAN format>",
+      "stage_id": <Backlog equivalent id>,
+      "assignee_ids": [],
+      "tag_ids": [],
+      "priority": "1",
+      "deadline": "<sprint 1 start date>"
+    },
+    ...
+  ]
+)
+```
+
+Output progress inline:
+```
+Creating parent tickets... done (<N> tickets)
+Adding subtasks... done (<P> subtasks)
+Creating STRAWMAN tickets... done (<Q> tickets)
+```
+
+---
+
+## Post-Creation Output
+
+```
+BACKLOG_GENERATOR complete.
+
+Created:
+  • <N> parent tickets across <M> sprints
+  • <P> subtasks
+  • <Q> STRAWMAN pre-condition tickets
+
+Project: <name> (Odoo ID: <id>)
+Stages: <stage list>
+
+Next steps:
+  1. Review tickets in Odoo and assign any unassigned roles.
+  2. Resolve STRAWMAN tickets before Sprint 1 begins.
+  3. Run ROADMAP skill when ready (not yet built — V1.5).
+```
+
+---
+
+## Write Session State
+
+After creation completes, silently:
+
+1. Write/update `session_state.md` in the current directory:
+
+```markdown
+# Session State — <engagement name>
+# Updated: <YYYY-MM-DD>
+
+## Current Stage
+Last completed: BACKLOG_GENERATOR
+Status: complete
+
+## Next Step
+Run: ROADMAP (not yet built — V1.5)
+From: <current directory path>
+
+## Open Items
+- ⚠ STRAWMAN: <decision> — source: BACKLOG_GENERATOR — resolve before Sprint 1
+(one line per STRAWMAN item; "(none)" if no STRAWMANs)
+
+## Notes
+Odoo project: <name> (ID: <id>)
+Tickets created: <N> parent + <P> subtasks + <Q> STRAWMAN
+```
+
+2. If `project.md` exists: update `Stage:` and `Last session:` fields only.
+   Leave all other fields unchanged.
+
+3. If `project.md` does not exist: skip step 2 silently.
+
+Output one line: `session_state.md updated.`
+
+---
+
+## Rules for this skill
+
+1. Never modify `arch.md` or any upstream artifact — BACKLOG_GENERATOR is execution layer only.
+2. Never create tickets without explicit consultant approval at the preview gate.
+3. Custom stages: always ask purpose mapping (To Do / Bug / Backlog equivalents) before
+   ticket creation. Never guess stage semantics.
+4. Default stage for new regular tickets = To Do equivalent. Never Backlog.
+5. Default stage for STRAWMAN tickets = Backlog equivalent. They are pre-conditions,
+   not ready-to-dev items.
+6. Team mapping: verify Odoo account exists before binding. Unconfirmed roles → blank assignee.
+7. Duplicate check: always run `list_tickets` before showing the preview. Warn + ask approval.
+   Never auto-proceed past duplicates.
+8. Sprint tags: create one Odoo tag per sprint label after project creation. Every parent
+   ticket and its subtasks get the sprint tag in `tag_ids`. Never omit sprint tags.
+9. Bulk creation only — never call `create_ticket` (single) for the main ticket set.
+10. STRAWMAN tickets use a separate `bulk_create_tickets` call (different stage + priority).
+11. Shared components: one subtask in the ticket where the component is FIRST built.
+    Later tickets reference it as text only — no duplicate subtask.
+12. Open Questions in ticket descriptions: only those whose `blocks:` field names this
+    Build Order item or any component under it. Do not copy all Open Questions into all tickets.
+13. LAYER_0_GLOBAL Rule 4 output limits apply. Rule 5 (no narration) applies.
+14. V1.4 boundary: never modify Odoo tickets after creation (consultant's job in Odoo).
+    Never create Odoo tickets that belong to ROADMAP or BACKLOG phase 2.

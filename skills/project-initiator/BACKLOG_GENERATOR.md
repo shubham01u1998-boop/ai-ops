@@ -214,12 +214,13 @@ Two tags per ticket:
 `tag_ids = [type_tag_id, sprint_tag_id]`
 
 ### Deadline
-Sprint end date from `## Sprint Mapping` for the sprint this item falls in.
-If no sprint end date available → no deadline set (not an error).
+Compute sprint end date from Sprint Mapping timeline: take the global start date, add (sprint_number × sprint_length_weeks × 7 days). Use the sprint end date as the deadline.
+If timeline or sprint dates cannot be determined from arch.md → no deadline set (not an error).
 
 ### Assignee
 From role → Odoo user ID map (Team Mapping step).
 If role not found or skipped → `assignee_ids: []`.
+When a Build Order item is owned by multiple roles in Sprint Mapping, assign to the first-listed (typically senior) role. If unclear, leave `assignee_ids: []` for the consultant to assign in Odoo.
 
 ### Priority
 - Default: `"0"` (low) for all tickets.
@@ -251,9 +252,11 @@ If role not found or skipped → `assignee_ids: []`.
 - <edge case the developer must handle>
 
 ## Open Questions
-- <question from arch.md ## Open Questions whose `blocks:` field names this component>
+- <question from arch.md ## Open Questions whose `blocks:` field names this Build Order item or any component under it>
 (none if no matching open questions)
 ```
+
+> If the component is a connector, job, worker, or aggregator (no HTTP endpoints): replace `## API Endpoints` with `## Interfaces` listing input sources, output targets, and schedule/trigger.
 
 ---
 
@@ -278,7 +281,7 @@ If role not found or skipped → `assignee_ids: []`.
 - <edge case>
 
 ## Open Questions
-- <question from arch.md ## Open Questions whose `blocks:` field names this component>
+- <question from arch.md ## Open Questions whose `blocks:` field names this Build Order item or any component under it>
 (none if no matching open questions)
 ```
 
@@ -292,6 +295,7 @@ Subtasks inherit the parent ticket's stage, assignee, and sprint tag.
 
 **Shared components:** A component flagged as shared in arch.md (marked `**(shared)**` or
 `**Shared:**`) gets a subtask only in the Build Order ticket where it is FIRST built.
+"First built" = the Build Order item with the lowest sequence number (position in the Build Order list) that lists this component under `## Components`.
 In all later parent tickets that use the same shared component, add a note in the
 description only: `(reuses <ComponentName> — built in Sprint N)`.
 Do not create duplicate subtasks for the same shared component.

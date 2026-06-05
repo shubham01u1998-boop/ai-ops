@@ -191,3 +191,109 @@ If type cannot be determined: default to backend. Flag inline in preview:
 `[type inferred — verify]`.
 
 ---
+
+## Ticket Structure
+
+Each parent ticket corresponds to one Build Order item.
+
+### Title format
+```
+[Sprint N] <Build Order item name>
+```
+Where N = sprint number(s) from `## Sprint Mapping` for that Build Order item.
+Example: `[Sprint 1-2] OracleConnector`
+
+### Default stage at creation
+- Regular tickets → To Do equivalent
+- STRAWMAN tickets → Backlog equivalent (they are pre-conditions/blockers)
+
+### Tags
+Two tags per ticket:
+1. **Type tag** — from Ticket Type Inference (`frontend` ID 2 or `backend` ID 44)
+2. **Sprint tag** — from sprint label → tag_id map (created in Project Setup)
+`tag_ids = [type_tag_id, sprint_tag_id]`
+
+### Deadline
+Sprint end date from `## Sprint Mapping` for the sprint this item falls in.
+If no sprint end date available → no deadline set (not an error).
+
+### Assignee
+From role → Odoo user ID map (Team Mapping step).
+If role not found or skipped → `assignee_ids: []`.
+
+### Priority
+- Default: `"0"` (low) for all tickets.
+- XL effort signal in `## Effort Signals` → `"1"` (high).
+- STRAWMAN tickets → `"1"` (high) — they block Sprint 1 start.
+
+---
+
+### Description format — Backend ticket
+
+```markdown
+## Scope
+<1-2 sentences: what this component does and why it exists in this sprint>
+
+## API Endpoints
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET    | /example/route | <what it returns> |
+| POST   | /example/route | <what it creates or updates> |
+
+## Key Business Rules
+- <rule derived from arch.md or mvp-scope.md context>
+
+## Acceptance Criteria
+- [ ] <testable pass/fail criterion>
+- [ ] <testable pass/fail criterion>
+
+## Edge Cases
+- <edge case the developer must handle>
+
+## Open Questions
+- <question from arch.md ## Open Questions whose `blocks:` field names this component>
+(none if no matching open questions)
+```
+
+---
+
+### Description format — Frontend ticket
+
+```markdown
+## Scope
+<1-2 sentences: what screens/flows this component covers>
+
+## Screens & Components
+- <ScreenName> — <purpose, key UI elements, filters or controls>
+- <ComponentName> — <reusable element, where used>
+
+## Key Business Rules
+- <rule>
+
+## Acceptance Criteria
+- [ ] <testable pass/fail criterion>
+- [ ] <testable pass/fail criterion>
+
+## Edge Cases
+- <edge case>
+
+## Open Questions
+- <question from arch.md ## Open Questions whose `blocks:` field names this component>
+(none if no matching open questions)
+```
+
+---
+
+### Subtasks
+One subtask per component listed under this Build Order item in `## Components`.
+Subtask title = component name + tech in parentheses.
+Example: `OracleConnector (Node.js)`
+Subtasks inherit the parent ticket's stage, assignee, and sprint tag.
+
+**Shared components:** A component flagged as shared in arch.md (marked `**(shared)**` or
+`**Shared:**`) gets a subtask only in the Build Order ticket where it is FIRST built.
+In all later parent tickets that use the same shared component, add a note in the
+description only: `(reuses <ComponentName> — built in Sprint N)`.
+Do not create duplicate subtasks for the same shared component.
+
+---

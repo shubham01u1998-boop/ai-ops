@@ -81,7 +81,7 @@ Project setup for <engagement name>:
     1. Backlog       — blocked items, pre-conditions
     2. To Do         — ready to pick up (default for new tickets)
     3. In Progress
-    4. Bug           — default stage for bug tickets at creation
+    4. Bug           — reserved; not used by BACKLOG_GENERATOR at creation
     5. Done
 
   Use default stages? (yes / provide custom)
@@ -382,8 +382,7 @@ until the consultant explicitly approves.
 ## Bulk Creation
 
 If any tickets were marked [EXISTS] during Duplicate Check, exclude them from all
-parent `bulk_create_tickets` and `add_subtasks` calls below. STRAWMAN tickets are
-not affected by [EXISTS] (they are always new).
+`bulk_create_tickets` and `add_subtasks` calls — including STRAWMAN tickets.
 
 On approval:
 

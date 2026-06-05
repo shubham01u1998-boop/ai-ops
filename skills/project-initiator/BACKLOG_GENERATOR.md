@@ -93,7 +93,7 @@ Project setup for <engagement name>:
 ```
 For each custom stage, what is its purpose?
   — Which stage is for newly created regular tickets? (equivalent to "To Do")
-  — Which stage is for newly created bug tickets? (equivalent to "Bug")
+  — Which stage is for bug tickets? (equivalent to "Bug") — reserved for future use, not used by BACKLOG_GENERATOR at creation
   — Which stage is for blocked/pre-condition items? (equivalent to "Backlog")
 ```
 Store answers as semantic role aliases. All ticket-creation logic uses
@@ -304,6 +304,8 @@ Do not create duplicate subtasks for the same shared component.
 
 ## STRAWMAN Tickets
 
+If `## STRAWMAN Summary` is absent from arch.md or contains no items, skip this section entirely — no STRAWMAN tickets are created and the STRAWMAN `bulk_create_tickets` call is omitted.
+
 After all Build Order tickets are generated, create one ticket per item in `## STRAWMAN Summary`.
 
 | Field | Value |
@@ -369,8 +371,8 @@ Adapt the example table to the actual engagement's Build Order and team mapping.
 
 **Natural-language handling:**
 - Clear approval ("yes", "create them", "looks good") → [A]
-- Edit request ("change sprint 5 ticket assignee to Tanu") → [B], apply, re-show table
-- "cancel" or "stop" → [C], do not create anything
+- Edit request ("change sprint 5 ticket assignee to Tanu") → [B], apply changes, re-show the full preview table, then re-ask: `Create these <N> tickets in Odoo? [A] Yes / [B] Edit / [C] Cancel`. Repeat until [A] or [C].
+- "cancel" or "stop" → [C], output `Cancelled. No tickets created.` and stop.
 
 Per LAYER_0_GLOBAL Rule 1: this prompt is the permission gate. Do not write to Odoo
 until the consultant explicitly approves.
@@ -378,6 +380,10 @@ until the consultant explicitly approves.
 ---
 
 ## Bulk Creation
+
+If any tickets were marked [EXISTS] during Duplicate Check, exclude them from all
+parent `bulk_create_tickets` and `add_subtasks` calls below. STRAWMAN tickets are
+not affected by [EXISTS] (they are always new).
 
 On approval:
 
@@ -499,7 +505,7 @@ Output one line: `session_state.md updated.`
 4. Default stage for new regular tickets = To Do equivalent. Never Backlog.
 5. Default stage for STRAWMAN tickets = Backlog equivalent. They are pre-conditions,
    not ready-to-dev items.
-6. Team mapping: verify Odoo account exists before binding. Unconfirmed roles → blank assignee.
+6. Team mapping: consultant-provided Odoo user IDs are accepted as-is. Roles typed as "skip" → `assignee_ids: []`. No account verification is performed — consultant is responsible for entering valid IDs.
 7. Duplicate check: always run `list_tickets` before showing the preview. Warn + ask approval.
    Never auto-proceed past duplicates.
 8. Sprint tags: create one Odoo tag per sprint label after project creation. Every parent

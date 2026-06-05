@@ -124,18 +124,17 @@ create one Odoo tag per sprint label via `create_tag`. Store sprint label → ta
 
 ## Team Mapping
 
-After project creation, show the team roster extracted from `## Sprint Mapping`:
+After project creation, show the team roster extracted from `## Sprint Mapping`.
+
+Build this table dynamically from `## Sprint Mapping`. One row per unique role. If arch.md shows a human name, use it in the `arch.md name` column; if only a role label or seniority is given, use that.
 
 ```
 Team roles from arch.md:
 
   Role           | arch.md name   | Odoo user ID
   ---------------|----------------|-------------
-  BE-senior      | (name)         | ?
-  BE-junior      | (name)         | ?
-  FE-senior      | (name)         | ?
-  FE-junior      | (name)         | ?
-  QA             | (name)         | ?
+  <role from Sprint Mapping> | <name or label from Sprint Mapping> | ?
+  (one row per unique role present in arch.md Sprint Mapping)
 
 Enter Odoo user ID for each role, or type "skip" to leave unassigned.
 Note: the person must have an Odoo account to be assigned tickets.
@@ -150,6 +149,8 @@ Do not ask again. If a role appears in multiple sprints, the same mapping applie
 ## Duplicate Check
 
 Runs before the preview gate — always, regardless of new vs existing project.
+
+At this point, all parent and STRAWMAN ticket titles have been generated internally using the Ticket Structure and STRAWMAN Tickets sections below. Run this check against that internal title list before showing the preview.
 
 Call `list_tickets(project_id=<project_id>, limit=100)`.
 Compare each generated ticket title (case-insensitive, exact match) against existing titles.
@@ -166,8 +167,9 @@ If duplicates found:
 ```
 Consultant must explicitly respond before the preview table is shown.
 
-**Preview table:** Duplicate-matched titles are marked `[EXISTS]` in the table even after
-[A] is chosen, so the consultant sees what was skipped.
+**Preview table:** When [A] is chosen, duplicate-matched titles are marked `[EXISTS]` so the consultant sees what was skipped.
+When [C] is chosen, all tickets (including duplicates) appear as normal rows — no `[EXISTS]` marker.
+When [B] is chosen: output `Cancelled. No tickets created.` and stop.
 
 If no duplicates found: proceed silently to preview.
 

@@ -99,10 +99,6 @@ For each custom stage, what is its purpose?
 Store answers as semantic role aliases. All ticket-creation logic uses
 "To Do equivalent", "Bug equivalent", "Backlog equivalent" — never hardcoded stage names.
 
-**Sprint tags:** Collect all unique sprint labels from `## Sprint Mapping`
-(e.g., "Sprint 1-2", "Sprint 3-4", "Sprint 5", "Sprint 6"). After project creation,
-create one Odoo tag per sprint label via `create_tag`. Store sprint label → tag_id map.
-
 **Before creating the project:** Call `list_active_projects` to check if a project with
 this name already exists.
 
@@ -118,7 +114,10 @@ If found:
 - [C]: stop.
 
 If not found: `create_project(name=<project_name>, stages=[<stage_list>])`
+→ Output: `Project "<name>" created in Odoo.`
 
-Output: `Project "<name>" created in Odoo.`
+**Sprint tags:** Collect all unique sprint labels from `## Sprint Mapping`
+(e.g., "Sprint 1-2", "Sprint 3-4", "Sprint 5", "Sprint 6"). After project creation,
+create one Odoo tag per sprint label via `create_tag`. Store sprint label → tag_id map.
 
 ---

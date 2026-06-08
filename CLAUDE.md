@@ -48,6 +48,8 @@ ai-ops/
 | PI V1.3 | ARCH_PROPOSER skill — built, tested on 2 synthetic fixtures (49/49 + 17/17) | Done |
 | PI V1.3.5 | DOC_GENERATOR skill — built, tested on 2 synthetic fixtures (56/56 + 22/22) | Done |
 | PI V1.4 | BACKLOG_GENERATOR skill — built, tested on 2 synthetic fixtures (72/72 + 22/22) | Done |
+| PI V1.4.1 | BACKLOG_GENERATOR patch — write backlog.md first, 3-option Next Steps Gate | Done |
+| PI V1.5 | ESTIMATOR skill — built, tested on 2 synthetic fixtures | Not started |
 
 ---
 
@@ -264,9 +266,26 @@ Test fixtures: `tests/fixtures/start/synthetic-new/` (new project path, 18/18), 
 
 ### Chain status
 
-START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (done) → ROADMAP (future)
+START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (V1.4.1, done) → ESTIMATOR (V1.5, in progress) → ROADMAP (future)
 
 Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), now in progress with START skill.
+
+### ESTIMATOR (V1.5 — in progress)
+
+Skill location: `skills/project-initiator/ESTIMATOR.md`
+
+**How to run:** Open Claude Code in the `<client-name>/` folder (with `arch.md` and
+`backlog.md` present). Say `run ESTIMATOR`. Reads both files, runs pre-flight,
+asks for estimate style (fixed/range), optional cost rates, and project start date.
+Generates `estimates.md` with Summary + client summary + detailed breakdown. Ends with Odoo gate.
+
+**Readiness Gate:** Checks for both `arch.md` (requires Effort Signals + Sprint Mapping +
+Build Order) and `backlog.md`. Blocks with clear message pointing to missing upstream skill.
+
+Design spec: `docs/superpowers/specs/2026-06-08-estimator-design.md`
+
+Test fixtures: `tests/fixtures/estimator/synthetic-01/` (fixed hours PASS),
+`tests/fixtures/estimator/synthetic-02-range/` (range + cost + date override)
 
 MCP tools pending for future phases: `odoo-mcp/PENDING_CHANGES.md`
 

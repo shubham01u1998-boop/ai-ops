@@ -162,7 +162,9 @@ Next skill by stage:
 - `DISCOVERY complete` → MVP_SYNTHESIZER
 - `MVP_SYNTHESIZER complete` → ARCH_PROPOSER
 - `ARCH_PROPOSER complete` → DOC_GENERATOR (not yet built — V1.3.5)
-- `DOC_GENERATOR complete` → BACKLOG_GENERATOR (not yet built — V1.4)
+- `DOC_GENERATOR complete` → BACKLOG_GENERATOR
+- `BACKLOG_GENERATOR complete` → ESTIMATOR
+- `ESTIMATOR complete` → (chain complete — ROADMAP in future)
 
 ---
 
@@ -171,6 +173,8 @@ Next skill by stage:
 If a subdirectory has no `project.md` but contains skill output files:
 
 Detect stage from files present (check in order — stop at first match):
+- `estimates.md` present → `ESTIMATOR complete`
+- `backlog.md` present → `BACKLOG_GENERATOR complete`
 - `arch.md` present → `ARCH_PROPOSER complete`
 - `mvp-scope.md` present → `MVP_SYNTHESIZER complete`
 - `discovery.md` present → `DISCOVERY complete`

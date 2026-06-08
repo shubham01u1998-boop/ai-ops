@@ -1,5 +1,5 @@
 # VERSION: 1.4.1 | Last updated: 2026-06-08 | Reviewed: pending
-# BACKLOG_GENERATOR — Project Initiator V1.4
+# BACKLOG_GENERATOR — Project Initiator V1.4.1
 # Part of the fiftyfive-tech Project Initiator toolchain.
 
 ---
@@ -417,7 +417,7 @@ After consultant approves the preview ([A] at the Preview gate), write `backlog.
 **File structure:**
 ```
 # Backlog — <engagement name>
-# Generated: <YYYY-MM-DD> | BACKLOG_GENERATOR V1.4
+# Generated: <YYYY-MM-DD> | BACKLOG_GENERATOR V1.4.1
 # Status: DRAFT — pending Odoo creation
 
 ## Project Config
@@ -446,11 +446,6 @@ Each parent ticket section uses a metadata table (Sprint, Type, Stage, Assignee 
 
 Write `backlog.md` immediately after preview is approved ([A] at the Preview gate).
 Always set `Status: DRAFT — pending Odoo creation` at write time.
-
-Output:
-```
-backlog.md written.
-```
 
 Then show the **Next Steps Gate** (see next section).
 After all Bulk Creation MCP calls succeed (if [A] chosen at Next Steps Gate), update the
@@ -645,5 +640,4 @@ Output one line: `session_state.md updated.`
 13. LAYER_0_GLOBAL Rule 4 output limits apply. Rule 5 (no narration) applies.
 14. V1.4 boundary: never modify Odoo tickets after creation (consultant's job in Odoo).
     Never create Odoo tickets that belong to ROADMAP or BACKLOG phase 2.
-15. backlog.md is always written before any MCP create call. It is the source of truth for
-    the ticket set. Odoo creation is a separate step that may happen immediately or later.
+15. `backlog.md` is always written before any ticket creation MCP call (`bulk_create_tickets`, `add_subtasks`). Project and sprint tag creation (in Project Setup) may run before `backlog.md` is written.

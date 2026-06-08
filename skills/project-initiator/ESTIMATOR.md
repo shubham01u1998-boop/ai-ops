@@ -200,3 +200,171 @@ For each item in `## Build Order` (in sequence order):
 
 Store results as ordered list matching Build Order sequence:
 `estimates = [{ item, size, hours, days, sprint, assignee, start, end, cost }]`
+
+---
+
+## Review Table
+
+Show the full computed estimate table. The `Size` column appears here for the consultant's
+reference only — it is never written to `estimates.md`.
+
+```
+Estimate preview — <engagement name> (<N> items):
+
+| #  | Feature / Build Order item       | Size | Hours     | Days    | Sprint     | Start      | End        | Cost             |
+|----|----------------------------------|------|-----------|---------|------------|------------|------------|------------------|
+| 1  | OracleConnector                  | L    | 40h       | 5d      | Sprint 1-2 | 2026-06-04 | 2026-07-02 | —                |
+| 2  | SalesAggregator + data model     | M    | 24h       | 3d      | Sprint 1-2 | 2026-06-04 | 2026-07-02 | —                |
+...
+
+Total: <N>h / <N>d   |   <start> → <end>   |   Cost: <total or N/A>
+```
+
+For range-based: Hours = `16–32h`, Days = `2–4d`, Cost = `₹X–Y`.
+For `[size unknown — review]` rows: Hours = `0h`, Days = `0d` — highlight clearly.
+
+```
+Adjust any row? Enter row# and new hours (e.g. "3: 32h" or "3: 24–40h"), or type 'done'.
+```
+
+**Adjustment loop:**
+- On adjustment input (e.g. "3: 32h"):
+  - Parse row number and new hours (or range).
+  - Recompute days: `days = ceil(hours / working_hours_per_day)`.
+  - Recompute cost for that row if `include_cost = true`.
+  - Output inline: `Row 3 updated: 32h / 4d` (and cost if applicable).
+  - Accept next input.
+- On 'done' with `[size unknown — review]` rows still at 0h:
+  - Output: `Rows [N] still have 0h — enter values before proceeding.`
+  - Do not proceed until all rows have non-zero hours.
+- On 'done' with all rows valid:
+  - Recompute totals across all rows.
+  - Output summary line: `Total: <N>h / <N>d | <start> → <end> | Cost: <total or N/A>`
+  - Proceed to write.
+
+---
+
+## Write estimates.md
+
+Write `estimates.md` to the current working directory. Use the template below exactly.
+Set `Status: DRAFT`.
+
+Output on success:
+```
+estimates.md written — <N> items, <total hours>h / <total days>d
+```
+
+---
+
+## Odoo Gate
+
+If `skip_odoo_gate = true` (backlog.md was Status: CREATED at pre-flight): skip this
+section entirely — output nothing, stop.
+
+Otherwise show:
+```
+What's next?
+[A] Create tickets in Odoo now
+[B] Skip — keep backlog.md as DRAFT, push to Odoo manually later
+```
+
+Natural-language handling:
+- "yes", "create now", "go ahead", "A" → [A]
+- "no", "skip", "later", "not now", "B" → [B]
+
+**[A] — execute Bulk Creation:**
+Follow the identical flow defined in BACKLOG_GENERATOR `## Bulk Creation`:
+1. If Odoo user IDs in backlog.md Team Mapping show "—": ask consultant to fill in or skip.
+2. Call `create_project(name=<project_name>, stages=[<stage_list>])`.
+3. Call `create_tag` for each sprint label. Store sprint label → tag_id map.
+4. Call `list_tickets(project_id=<id>, limit=100)` for duplicate check.
+5. Show preview table from backlog.md. Ask: `Create these <N> tickets in Odoo? [A] Yes / [B] Cancel`
+6. On Yes: execute `bulk_create_tickets` and `add_subtasks` per BACKLOG_GENERATOR spec.
+7. Update `backlog.md` Status line to `Status: CREATED — tickets in Odoo (project ID: <id>)`.
+
+**[B] — skip:**
+```
+backlog.md and estimates.md saved as DRAFT.
+To push to Odoo later: run BACKLOG_GENERATOR — it will detect backlog.md and offer push mode.
+```
+Stop.
+
+---
+
+## estimates.md Template
+
+Write `estimates.md` using this structure exactly. No merged cells. No nested rows.
+No S/M/L/XL labels in any column.
+
+```markdown
+# Estimates — <Engagement Name>
+# Generated: <YYYY-MM-DD> | ESTIMATOR V1.5
+# Status: DRAFT
+
+---
+
+## Summary
+
+| Field | Value |
+|---|---|
+| Total effort | <N>h / <N>d  (range: <low>–<high>h / <low>–<high>d) |
+| Timeline | <project start> → <project end> |
+| Team size | <N> people (from backlog.md Team Mapping) |
+| Sprints | <N> sprints (from Sprint Mapping) |
+| Cost estimate | <total or range, or N/A> |
+
+---
+
+## Section 1 — Client Summary
+
+One subsection per sprint, in sprint order. Within each sprint subsection, one row
+per Build Order item assigned to that sprint.
+
+### Sprint 1 — <sprint start date> → <sprint end date>
+
+| Feature | Hours | Days | Cost |
+|---|---|---|---|
+| <Build Order item name> | <N>h | <N>d | <cost or —> |
+
+**Sprint 1 total: <N>h / <N>d / <cost or N/A>**
+
+(repeat for each sprint)
+
+---
+**Project total: <N>h / <N>d / <cost or N/A>**
+
+---
+
+## Section 2 — Detailed Breakdown
+
+One row per parent ticket from backlog.md, in Build Order sequence.
+
+| # | Ticket | Sprint | Assignee | Hours | Days | Start | End | Cost |
+|---|---|---|---|---|---|---|---|---|
+| T01 | <ticket title from backlog.md> | Sprint 1 | <role> | <N>h | <N>d | <date> | <date> | <cost or —> |
+
+**Total: <N>h / <N>d / <cost or N/A>**
+
+---
+
+## Section 3 — Assumptions
+
+- Estimate basis: S=<N>h, M=<N>h, L=<N>h, XL=<N>h
+  (or: S=<low>–<high>h, M=<low>–<high>h, L=<low>–<high>h, XL=<low>–<high>h for range)
+- Working hours per day: <N>
+- Cost rates: <per-role table or blended rate statement, or N/A>
+- Excludes: QA effort beyond sprint allocation, DevOps setup time,
+  client feedback cycles, post-go-live support
+```
+
+---
+
+## Rules for this skill
+
+1. S/M/L/XL size labels never appear in `estimates.md` — always convert to hours/days first.
+2. All tables in `estimates.md` must be flat: no merged cells, no nested rows.
+3. Cost column always shows "—" when cost is opted out — never leave blank.
+4. Never modify `arch.md`, `backlog.md`, or any other upstream file.
+5. If `estimates.md` already exists and [A] overwrite is chosen: previous file is fully replaced.
+6. Odoo gate is skipped if `backlog.md` Status was CREATED at pre-flight.
+7. LAYER_0_GLOBAL Rule 4 output limits and Rule 5 (no narration) apply.

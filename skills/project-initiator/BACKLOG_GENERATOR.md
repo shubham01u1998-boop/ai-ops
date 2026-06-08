@@ -412,7 +412,7 @@ until the consultant explicitly approves via the Next Steps Gate.
 
 ## Write backlog.md
 
-After consultant approves preview ([A] or [B]), write `backlog.md` to the current directory before any MCP calls.
+After consultant approves the preview ([A] at the Preview gate), write `backlog.md` to the current directory before any MCP calls.
 
 **File structure:**
 ```

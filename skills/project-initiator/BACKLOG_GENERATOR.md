@@ -1,4 +1,4 @@
-# VERSION: 1.4 | Last updated: 2026-06-04 | Reviewed: pending
+# VERSION: 1.4.1 | Last updated: 2026-06-08 | Reviewed: pending
 # BACKLOG_GENERATOR — Project Initiator V1.4
 # Part of the fiftyfive-tech Project Initiator toolchain.
 
@@ -61,7 +61,25 @@ Optional (used if present): `## Effort Signals`, `## Open Questions`, `## STRAWM
    - `## STRAWMAN Summary` → tentative decisions (become dedicated STRAWMAN tickets)
    - `## Integration Points` → table of systems + risk + open questions
 
-5. After loading successfully, output one line:
+5. Check if `backlog.md` exists in the current directory.
+   - If found with `Status: DRAFT`:
+     ```
+     backlog.md found (status: DRAFT — not yet pushed to Odoo).
+     [A] Push backlog.md to Odoo now
+     [B] Re-run BACKLOG_GENERATOR (overwrites backlog.md)
+     [C] Cancel
+     ```
+     [A]: skip to Push Mode section. [B]: continue normal flow. [C]: stop.
+   - If found with `Status: CREATED`:
+     ```
+     backlog.md found (status: CREATED — tickets already exist in Odoo).
+     [A] Re-run BACKLOG_GENERATOR (will overwrite backlog.md and create new tickets)
+     [B] Cancel
+     ```
+     [A]: continue normal flow (duplicate check will catch existing tickets). [B]: stop.
+   - If not found: continue normal flow.
+
+6. After loading successfully, output one line:
 ```
 Engagement: <name> | arch.md loaded. Starting project setup.
 ```
@@ -124,7 +142,10 @@ create one Odoo tag per sprint label via `create_tag`. Store sprint label → ta
 
 ## Team Mapping
 
-After project creation, show the team roster extracted from `## Sprint Mapping`.
+After project creation, silently call `list_metadata` to retrieve the list of valid Odoo
+user IDs. Store this list for validation below.
+
+Show the team roster extracted from `## Sprint Mapping`.
 
 Build this table dynamically from `## Sprint Mapping`. One row per unique role. If arch.md shows a human name, use it in the `arch.md name` column; if only a role label or seniority is given, use that.
 
@@ -137,10 +158,17 @@ Team roles from arch.md:
   (one row per unique role present in arch.md Sprint Mapping)
 
 Enter Odoo user ID for each role, or type "skip" to leave unassigned.
-Note: the person must have an Odoo account to be assigned tickets.
 ```
 
-Store completed role → assignee_id map. Roles marked "skip" → `assignee_ids: []`.
+After all IDs are entered, validate each against the `list_metadata` user list.
+For any ID not found:
+```
+⚠ User ID <N> not found in Odoo — role "<X>" will be left unassigned.
+  Re-enter a valid ID, or press Enter to leave unassigned.
+```
+Wait for response before proceeding. Re-entered IDs are re-validated in the same way.
+
+Store completed role → assignee_id map. Roles skipped or confirmed invalid → `assignee_ids: []`.
 
 Do not ask again. If a role appears in multiple sprints, the same mapping applies throughout.
 
@@ -364,18 +392,115 @@ STRAWMAN tickets (5):
 |   | ⚠ STRAWMAN: Verify Oracle POS method...| —        | —      | (unassigned)  | Backlog|
 ...
 
-Create these <N> tickets in Odoo? [A] Yes / [B] Edit / [C] Cancel
+Approve this ticket set?
+[A] Yes — looks good
+[B] Edit
+[C] Cancel — do not save
 ```
 
 Adapt the example table to the actual engagement's Build Order and team mapping.
 
 **Natural-language handling:**
-- Clear approval ("yes", "create them", "looks good") → [A]
-- Edit request ("change sprint 5 ticket assignee to Tanu") → [B], apply changes, re-show the full preview table, then re-ask: `Create these <N> tickets in Odoo? [A] Yes / [B] Edit / [C] Cancel`. Repeat until [A] or [C].
-- "cancel" or "stop" → [C], output `Cancelled. No tickets created.` and stop.
+- "yes", "looks good", "approve", "create them" → [A]: write `backlog.md` (DRAFT), then show Next Steps Gate.
+- Edit request ("change sprint 5 ticket assignee to Tanu") → [B]: apply changes, re-show the full preview table, then re-ask. Repeat until [A] or [C].
+- "cancel", "stop" → [C]: output `Cancelled. No tickets or files created.` and stop.
 
 Per LAYER_0_GLOBAL Rule 1: this prompt is the permission gate. Do not write to Odoo
-until the consultant explicitly approves.
+until the consultant explicitly approves via the Next Steps Gate.
+
+---
+
+## Write backlog.md
+
+After consultant approves preview ([A] or [B]), write `backlog.md` to the current directory before any MCP calls.
+
+**File structure:**
+```
+# Backlog — <engagement name>
+# Generated: <YYYY-MM-DD> | BACKLOG_GENERATOR V1.4
+# Status: DRAFT — pending Odoo creation
+
+## Project Config
+(project name, Odoo project ID — "—" until created)
+
+### Stages
+(stage name → semantic role table)
+
+## Team Mapping
+(role → arch.md label → Odoo user ID table; "—" for any unresolved IDs)
+
+## Sprint Tags
+(sprint → date range → Odoo tag ID table; "—" until created)
+
+## Parent Tickets — <N>
+(one section per ticket: metadata table + full description body)
+
+## STRAWMAN Tickets — <Q>
+(one section per STRAWMAN: metadata table + description)
+
+## Push to Odoo
+(instructions for running push mode later)
+```
+
+Each parent ticket section uses a metadata table (Sprint, Type, Stage, Assignee role, Deadline, Priority, Subtasks, Shared reuse notes) followed by the full markdown description.
+
+Write `backlog.md` immediately after preview is approved ([A] at the Preview gate).
+Always set `Status: DRAFT — pending Odoo creation` at write time.
+
+Output:
+```
+backlog.md written.
+```
+
+Then show the **Next Steps Gate** (see next section).
+After all Bulk Creation MCP calls succeed (if [A] chosen at Next Steps Gate), update the
+status line in `backlog.md` to `Status: CREATED — tickets in Odoo (project ID: <id>)`.
+
+---
+
+## Next Steps Gate
+
+Shown immediately after `backlog.md` is written. Never shown before.
+
+```
+backlog.md written. What's next?
+[A] Create tickets in Odoo now
+[B] Run ESTIMATOR first — generate estimates.md, then decide on Odoo
+[C] Skip — keep backlog.md as draft, push to Odoo manually later
+```
+
+- [A]: proceed to Bulk Creation (next section).
+- [B]: output:
+  ```
+  Run ESTIMATOR from this folder: say "run ESTIMATOR"
+  ESTIMATOR will ask about Odoo creation when it finishes.
+  ```
+  Then stop.
+- [C]: output:
+  ```
+  backlog.md saved as DRAFT.
+  To push to Odoo later: run BACKLOG_GENERATOR — it will detect backlog.md and offer push mode.
+  ```
+  Then stop.
+
+Natural-language handling:
+- "create", "odoo now", "yes", "A" → [A]
+- "estimator", "estimate first", "B" → [B]
+- "skip", "later", "not now", "C" → [C]
+
+---
+
+## Push Mode
+
+Entered when consultant selects [A] at the backlog.md detection prompt in Pre-flight.
+
+1. Read `backlog.md`. Extract: project name, stages (with semantic roles), team mapping (Odoo user IDs), sprint labels, all parent tickets, all STRAWMAN tickets.
+2. For any Odoo user ID still showing "—": ask consultant to fill in or skip before proceeding.
+3. Call `create_project(name=<project_name>, stages=[<stage_list>])`.
+4. Call `create_tag` for each sprint label. Store sprint label → tag_id map.
+5. Call `list_tickets(project_id=<id>, limit=100)` for duplicate check (same logic as Duplicate Check section).
+6. Show the preview table from backlog.md. Ask: `Create these <N> tickets in Odoo? [A] Yes / [B] Cancel`
+7. On [A]: execute Bulk Creation using data from backlog.md. Update `backlog.md` status line to `CREATED`.
 
 ---
 
@@ -504,7 +629,9 @@ Output one line: `session_state.md updated.`
 4. Default stage for new regular tickets = To Do equivalent. Never Backlog.
 5. Default stage for STRAWMAN tickets = Backlog equivalent. They are pre-conditions,
    not ready-to-dev items.
-6. Team mapping: consultant-provided Odoo user IDs are accepted as-is. Roles typed as "skip" → `assignee_ids: []`. No account verification is performed — consultant is responsible for entering valid IDs.
+6. Team mapping: validate each entered Odoo user ID against `list_metadata` before
+   ticket creation. Invalid IDs → warn consultant inline, offer re-entry or leave unassigned.
+   Roles skipped or confirmed invalid → `assignee_ids: []`.
 7. Duplicate check: always run `list_tickets` before showing the preview. Warn + ask approval.
    Never auto-proceed past duplicates.
 8. Sprint tags: create one Odoo tag per sprint label after project creation. Every parent
@@ -518,3 +645,5 @@ Output one line: `session_state.md updated.`
 13. LAYER_0_GLOBAL Rule 4 output limits apply. Rule 5 (no narration) applies.
 14. V1.4 boundary: never modify Odoo tickets after creation (consultant's job in Odoo).
     Never create Odoo tickets that belong to ROADMAP or BACKLOG phase 2.
+15. backlog.md is always written before any MCP create call. It is the source of truth for
+    the ticket set. Odoo creation is a separate step that may happen immediately or later.

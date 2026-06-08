@@ -8,9 +8,11 @@
 
 ESTIMATOR reads `arch.md` and `backlog.md` from the engagement folder, converts S/M/L/XL
 effort signals to hours/days, maps estimates to sprint dates, and generates `estimates.md` —
-a structured estimation document with two sections:
+a structured estimation document with a Summary block and three sections:
+- **Summary:** Key metrics (effort, timeline, team size, cost)
 - **Section 1:** Executive summary for the client (grouped by sprint → feature)
 - **Section 2:** Detailed breakdown for the internal team or senior reviewer
+- **Section 3:** Assumptions and exclusions
 
 The file is format-neutral Markdown with flat tables (no merged cells, no nested rows),
 suitable for conversion to Excel, PDF, or Word. S/M/L/XL size labels never appear in
@@ -127,6 +129,8 @@ Estimation config for <engagement name>:
   3. Include cost estimates? (Y/N)
 ```
 
+Store working hours per day from question 2 as `working_hours_per_day` (default 8 if Enter pressed).
+
 After response, follow up based on answers:
 
 **If [A] Fixed:**
@@ -189,6 +193,9 @@ For each item in `## Build Order` (in sequence order):
    - Compute start date: confirmed project start date + days from start to this sprint's
      first day (derived from Sprint Mapping offsets).
    - If deadline blank or sprint dates unknown: set start = "—", end = "—".
+   - If no parent ticket match is found in backlog.md: flag inline as
+     `[backlog entry missing — review]`; set sprint = "—", assignee = "—",
+     start = "—", end = "—".
 
 5. **Compute cost (only if `include_cost = true`):**
    - Fixed + blended: `cost = days × blended_rate`
@@ -318,7 +325,8 @@ No S/M/L/XL labels in any column.
 ## Section 1 — Client Summary
 
 One subsection per sprint, in sprint order. Within each sprint subsection, one row
-per Build Order item assigned to that sprint.
+per Build Order item assigned to that sprint. If an item spans multiple sprints
+(e.g. "Sprint 1-2"), place it under the section for the sprint in which it starts.
 
 ### Sprint 1 — <sprint start date> → <sprint end date>
 

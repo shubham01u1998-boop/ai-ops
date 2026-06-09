@@ -35,7 +35,8 @@ Before asking anything, silently:
    b. Known status buckets: active, blocked, completed, archived.
    c. For each subdirectory found:
       - If the subdirectory name matches a known bucket → run `ls -d <bucket>/*/`
-        via Bash to list engagements inside. Mark each found path with its bucket name.
+        via Bash to list engagements inside (ignore errors if bucket is empty).
+        Mark each found path with its bucket name.
       - Otherwise → attempt Read on `<subdir>/project.md` directly.
         If found, mark as status: active (legacy flat folder — no migration prompted).
    d. For each engagement path collected (bucketed or flat), attempt Read on
@@ -69,7 +70,8 @@ Blocked:
 If consultant types C or A: display that group's entries with numbers continuing
 from the last shown number. Resume and transition flow identical to active/blocked.
 
-If Active and Blocked are both empty: skip menu, go directly to New Project Flow.
+If Active and Blocked are both empty and no completed/archived entries exist: skip menu, go directly to New Project Flow.
+If Active and Blocked are both empty but completed or archived entries exist: show menu with only the (C)/(A) options.
 
 ---
 
@@ -159,7 +161,7 @@ On consultant selecting a number from the main menu:
 
 ```
 <Engagement Name> — <Stage>
-Open Claude Code in ~/fiftyfive-engagements/<slug>/ and run <Next Step>.
+Open Claude Code in <path from registry> and run <Next Step>.
 
 Open items from last session:
 - <item 1>
@@ -210,7 +212,9 @@ Client name for this engagement?
 Project type? (web / mobile / PWA / enterprise / hybrid)
 ```
 
-Show confirmation with full path, then write `project.md` with confirmed details + detected stage + today's date for Last session. The retroactive project.md must include `Status: active` between Type and Stage fields.
+Show confirmation with full path, then write `project.md` with confirmed details + detected stage + today's date for Last session. The retroactive project.md must include a `Status:` field between Type and Stage fields.
+Use the bucket name as the status value if the folder is inside a known bucket (e.g. `blocked/` → `Status: blocked`).
+For flat/legacy folders outside any bucket, use `Status: active`.
 
 ---
 
@@ -227,8 +231,9 @@ Status: active  →  (C) mark completed  /  skip
 
 **For all other stages:**
 ```
-Status: <current-status>  →  (B) blocked  /  (C) completed  /  (A) archived  /  skip
+Status: <current-status>  →  [options excluding current status: B/C/A]  /  skip
 ```
+Do not offer the option that matches the current status.
 
 On B / C / A selection:
 
@@ -257,8 +262,31 @@ On B / C / A selection:
       ```
 
 **Legacy flat folders** (no bucket parent, e.g. `~/fiftyfive-engagements/retailedge/`):
-Show `Status: active (legacy path)  →  (B) blocked  /  (C) completed  /  (A) archived  /  skip`
-On selection, confirm move to `~/fiftyfive-engagements/<new-status>/<slug>/` and execute as above.
+
+Show: `Status: active (legacy path)  →  (B) blocked  /  (C) completed  /  (A) archived  /  skip`
+
+On selection:
+1. Show confirmation:
+   ```
+   Move ~/fiftyfive-engagements/<slug>/
+     → ~/fiftyfive-engagements/<new-status>/<slug>/
+   Update project.md  Status: add/update → <new-status>
+   Update session_state.md  From: path
+
+   Confirm? (yes / no)
+   ```
+2. On "no": no changes, end turn.
+3. On "yes":
+   a. Run via Bash: `mkdir -p ~/fiftyfive-engagements/<new-status>/`
+   b. Run via Bash: `mv ~/fiftyfive-engagements/<slug> ~/fiftyfive-engagements/<new-status>/<slug>`
+   c. Read `~/fiftyfive-engagements/<new-status>/<slug>/project.md`.
+      If a `Status:` line exists, replace it with `Status: <new-status>`.
+      If no `Status:` line, add `Status: <new-status>` after the `Type:` line. Write file back.
+   d. Read `~/fiftyfive-engagements/<new-status>/<slug>/session_state.md`.
+      Replace `From: ~/fiftyfive-engagements/<slug>/`
+      with   `From: ~/fiftyfive-engagements/<new-status>/<slug>/`. Write file back.
+   e. Output: `Done. ~/fiftyfive-engagements/<new-status>/<slug>/ — Status updated to <new-status>.`
+
 On skip: leave flat, no migration.
 
 ---

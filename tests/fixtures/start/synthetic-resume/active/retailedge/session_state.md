@@ -7,7 +7,7 @@ Status: complete
 
 ## Next Step
 Run: DOC_GENERATOR
-From: ~/fiftyfive-engagements/retailedge/
+From: ~/fiftyfive-engagements/active/retailedge/
 
 ## Open Items
 - Oracle Retail POS integration method unconfirmed — source: ARCH_PROPOSER — blocks: OracleConnector

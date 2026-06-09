@@ -2,5 +2,6 @@
 Client: VectorSeven Inc
 Type: Enterprise
 Started: 2026-05-15
+Status: active
 Stage: DISCOVERY complete
 Last session: 2026-05-22

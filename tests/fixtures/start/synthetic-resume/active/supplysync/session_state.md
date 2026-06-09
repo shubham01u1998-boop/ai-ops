@@ -7,9 +7,9 @@ Status: complete
 
 ## Next Step
 Run: ARCH_PROPOSER
-From: ~/fiftyfive-engagements/supplysync/
+From: ~/fiftyfive-engagements/active/supplysync/
 
 ## Open Items
-- Supplier portal integration scope — deferred during MVP_SYNTHESIZER
+(none)
 
 ## Notes

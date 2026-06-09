@@ -7,9 +7,9 @@ Status: complete
 
 ## Next Step
 Run: MVP_SYNTHESIZER
-From: ~/fiftyfive-engagements/vectorseven/
+From: ~/fiftyfive-engagements/active/vectorseven/
 
 ## Open Items
-- Legacy ERP integration details — source: DISCOVERY — Open Question carried forward
+(none)
 
 ## Notes

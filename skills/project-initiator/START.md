@@ -49,16 +49,27 @@ Before asking anything, silently:
 
 ## Main Menu
 
+Display rules:
+- Show Active and Blocked groups by default (skip group header if that group is empty).
+- Numbers are global across groups (no per-group restart).
+- Sort within each group by Last session date, most recent first.
+- Completed and Archived shown as collapsed count + option letter at the bottom.
+
 ```
-Active engagements:
+Active:
 1. RetailEdge (FreshMart) — PWA — ARCH_PROPOSER complete — 2026-06-04
 2. SupplySync (LogiCo) — Web — MVP_SYNTHESIZER complete — 2026-05-30
+
+Blocked:
 3. VectorSeven (VectorSeven Inc) — Enterprise — DISCOVERY complete — 2026-05-22
 
-Which? (1 / 2 / 3) or N for new project
+(C) completed (4)   (A) archived (1)   (N) new project
 ```
 
-Sort by Last session date, most recent first.
+If consultant types C or A: display that group's entries with numbers continuing
+from the last shown number. Resume and transition flow identical to active/blocked.
+
+If Active and Blocked are both empty: skip menu, go directly to New Project Flow.
 
 ---
 

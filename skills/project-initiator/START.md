@@ -108,7 +108,7 @@ Cancelled — no folders created.
 
 On "yes":
 1. Run via Bash: `mkdir -p ~/fiftyfive-engagements/active/<slug>/input`
-2. Write `~/fiftyfive-engagements/<slug>/project.md`:
+2. Write `~/fiftyfive-engagements/active/<slug>/project.md`:
 
 ```markdown
 # Project — <engagement name>
@@ -120,7 +120,7 @@ Stage: not started
 Last session: <YYYY-MM-DD>
 ```
 
-3. Write `~/fiftyfive-engagements/<slug>/session_state.md`:
+3. Write `~/fiftyfive-engagements/active/<slug>/session_state.md`:
 
 ```markdown
 # Session State — <engagement name>

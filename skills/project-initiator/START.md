@@ -214,6 +214,55 @@ Show confirmation with full path, then write `project.md` with confirmed details
 
 ---
 
+## Status Transitions
+
+After showing resume output for any engagement (from Main Menu selection or Resume Single
+Engagement), append a status prompt:
+
+**If stage = `ESTIMATOR complete` and current status = `active`:**
+```
+Chain complete — all skills done.
+Status: active  →  (C) mark completed  /  skip
+```
+
+**For all other stages:**
+```
+Status: <current-status>  →  (B) blocked  /  (C) completed  /  (A) archived  /  skip
+```
+
+On B / C / A selection:
+
+1. Determine new bucket: B → blocked | C → completed | A → archived.
+2. Show confirmation:
+   ```
+   Move ~/fiftyfive-engagements/<old-status>/<slug>/
+     → ~/fiftyfive-engagements/<new-status>/<slug>/
+   Update project.md  Status: <old-status> → <new-status>
+   Update session_state.md  From: path
+
+   Confirm? (yes / no)
+   ```
+3. On "no": no changes, end turn.
+4. On "yes":
+   a. Run via Bash: `mkdir -p ~/fiftyfive-engagements/<new-status>/`
+   b. Run via Bash: `mv ~/fiftyfive-engagements/<old-status>/<slug> ~/fiftyfive-engagements/<new-status>/<slug>`
+   c. Read `~/fiftyfive-engagements/<new-status>/<slug>/project.md`.
+      Replace line `Status: <old-status>` with `Status: <new-status>`. Write file back.
+   d. Read `~/fiftyfive-engagements/<new-status>/<slug>/session_state.md`.
+      Replace `From: ~/fiftyfive-engagements/<old-status>/<slug>/`
+      with   `From: ~/fiftyfive-engagements/<new-status>/<slug>/`. Write file back.
+   e. Output:
+      ```
+      Done. ~/fiftyfive-engagements/<new-status>/<slug>/ — Status updated to <new-status>.
+      ```
+
+**Legacy flat folders** (no bucket parent, e.g. `~/fiftyfive-engagements/retailedge/`):
+Show `Status: active (legacy path)  →  (B) blocked  /  (C) completed  /  (A) archived  /  skip`
+On selection, confirm move to `~/fiftyfive-engagements/<new-status>/<slug>/` and execute as above.
+On skip: leave flat, no migration.
+
+---
+
 ## Rules for this skill
 
 1. Never create folders or files without explicit human confirmation — show full paths first.

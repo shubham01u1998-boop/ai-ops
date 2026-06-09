@@ -95,6 +95,7 @@ On "yes":
 Client: <client name>
 Type: <type>
 Started: <YYYY-MM-DD>
+Status: active
 Stage: not started
 Last session: <YYYY-MM-DD>
 ```
@@ -189,7 +190,7 @@ Client name for this engagement?
 Project type? (web / mobile / PWA / enterprise / hybrid)
 ```
 
-Show confirmation with full path, then write `project.md` with confirmed details + detected stage + today's date for Last session.
+Show confirmation with full path, then write `project.md` with confirmed details + detected stage + today's date for Last session. The retroactive project.md must include `Status: active` between Type and Stage fields.
 
 ---
 

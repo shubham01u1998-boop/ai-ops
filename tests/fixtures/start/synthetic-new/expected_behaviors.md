@@ -17,10 +17,10 @@
 
 ## Confirmation Gate
 - [ ] Shows full folder paths before creating anything:
-      ~/fiftyfive-engagements/retailedge/
-      ~/fiftyfive-engagements/retailedge/input/
-      ~/fiftyfive-engagements/retailedge/project.md
-      ~/fiftyfive-engagements/retailedge/session_state.md
+      ~/fiftyfive-engagements/active/retailedge/
+      ~/fiftyfive-engagements/active/retailedge/input/
+      ~/fiftyfive-engagements/active/retailedge/project.md
+      ~/fiftyfive-engagements/active/retailedge/session_state.md
 - [ ] Asks "Confirm? (yes / no)"
 - [ ] Does NOT create any files before confirmation
 - [ ] On "no": outputs "Cancelled — no folders created." and stops
@@ -32,6 +32,7 @@
       Client: FreshMart
       Type: PWA
       Started: <today: YYYY-MM-DD>
+      Status: active
       Stage: not started
       Last session: <today: YYYY-MM-DD>
 - [ ] session_state.md written with correct content:
@@ -42,16 +43,16 @@
       Status: not started
       ## Next Step
       Run: DISCOVERY
-      From: ~/fiftyfive-engagements/retailedge/
+      From: ~/fiftyfive-engagements/active/retailedge/
       ## Open Items
       (none)
       ## Notes
 - [ ] input/ subfolder created
 
 ## Handoff Output
-- [ ] Outputs path of created folder
-- [ ] Tells consultant to drop docs in input/ subfolder
-- [ ] Tells consultant to open Claude Code in retailedge/ and say "run DISCOVERY"
+- [ ] Outputs path ~/fiftyfive-engagements/active/retailedge/
+- [ ] Tells consultant to drop docs in ~/fiftyfive-engagements/active/retailedge/input/
+- [ ] Tells consultant to open Claude Code in ~/fiftyfive-engagements/active/retailedge/ and say "run DISCOVERY"
 
 ## Test Notes
 - This fixture simulates running START from a parent directory with no existing engagements.

@@ -1,5 +1,5 @@
-# VERSION: 1.0 | Last updated: 2026-06-04 | Reviewed: pending
-# START — Project Initiator V1.2
+# VERSION: 1.3 | Last updated: 2026-06-09 | Reviewed: pending
+# START — Project Initiator V1.3
 # Part of the fiftyfive-tech Project Initiator toolchain.
 
 ---
@@ -184,7 +184,7 @@ Next skill by stage:
 - `not started` → DISCOVERY
 - `DISCOVERY complete` → MVP_SYNTHESIZER
 - `MVP_SYNTHESIZER complete` → ARCH_PROPOSER
-- `ARCH_PROPOSER complete` → DOC_GENERATOR (not yet built — V1.3.5)
+- `ARCH_PROPOSER complete` → DOC_GENERATOR
 - `DOC_GENERATOR complete` → BACKLOG_GENERATOR
 - `BACKLOG_GENERATOR complete` → ESTIMATOR
 - `ESTIMATOR complete` → (chain complete — ROADMAP in future)
@@ -223,6 +223,11 @@ For flat/legacy folders outside any bucket, use `Status: active`.
 After showing resume output for any engagement (from Main Menu selection or Resume Single
 Engagement), append a status prompt:
 
+Note: status transitions require running START from the parent `~/fiftyfive-engagements/`
+directory. If running from inside an engagement folder (Resume Single Engagement flow),
+skip the status transition prompt — folder moves cannot be performed from within the
+current working directory on all platforms.
+
 **If stage = `ESTIMATOR complete` and current status = `active`:**
 ```
 Chain complete — all skills done.
@@ -231,13 +236,14 @@ Status: active  →  (C) mark completed  /  skip
 
 **For all other stages:**
 ```
-Status: <current-status>  →  [options excluding current status: B/C/A]  /  skip
+Status: <current-status>  →  [options excluding current status: B/C/A/R(→active)]  /  skip
 ```
-Do not offer the option that matches the current status.
+Options: B → blocked | C → completed | A → archived | R → reactivate → active
+Do not offer the option that matches the current status. (active engagements never see R.)
 
 On B / C / A selection:
 
-1. Determine new bucket: B → blocked | C → completed | A → archived.
+1. Determine new bucket: B → blocked | C → completed | A → archived | R → active.
 2. Show confirmation:
    ```
    Move ~/fiftyfive-engagements/<old-status>/<slug>/

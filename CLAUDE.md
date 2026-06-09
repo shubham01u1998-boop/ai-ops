@@ -23,8 +23,6 @@ ai-ops/
     fixtures/
       discovery/           # Synthetic engagement fixtures for DISCOVERY testing
       mvp-synthesizer/     # Synthetic engagement fixtures for MVP_SYNTHESIZER testing
-  templates/               # future: generic project template
-  ci/                      # future: GitLab CI integration
   odoo-mcp/                # Python MCP server (separate repo context)
 ```
 
@@ -45,11 +43,12 @@ ai-ops/
 | PI V1.0 | DISCOVERY skill — built, tested on 2 synthetic fixtures (64/64) | Done |
 | PI V1.1 | MVP_SYNTHESIZER skill — readiness gate + mvp-scope.md | Done |
 | PI V1.2 | START skill + SESSION_STATE integration | Done |
+| PI V1.3 | START V1.3 — status bucket folders (active/blocked/completed/archived), transition section, 3 test fixtures | Done |
 | PI V1.3 | ARCH_PROPOSER skill — built, tested on 2 synthetic fixtures (49/49 + 17/17) | Done |
 | PI V1.3.5 | DOC_GENERATOR skill — built, tested on 2 synthetic fixtures (56/56 + 22/22) | Done |
 | PI V1.4 | BACKLOG_GENERATOR skill — built, tested on 2 synthetic fixtures (72/72 + 22/22) | Done |
 | PI V1.4.1 | BACKLOG_GENERATOR patch — write backlog.md first, 3-option Next Steps Gate | Done |
-| PI V1.5 | ESTIMATOR skill — built, tested on 2 synthetic fixtures | Not started |
+| PI V1.5 | ESTIMATOR skill — built, tested on 2 synthetic fixtures (48/48 + 45/45) | Done |
 
 ---
 
@@ -251,7 +250,7 @@ Design spec: `docs/superpowers/specs/2026-06-04-backlog-generator-design.md`
 Test fixtures: `tests/fixtures/backlog-generator/synthetic-01/` (72/72),
 `tests/fixtures/backlog-generator/synthetic-02-duplicate/` (22/22)
 
-### START (V1.2 — done)
+### START (V1.3 — done)
 
 Skill location: `skills/project-initiator/START.md`
 
@@ -262,15 +261,15 @@ Also runs from inside a client folder as a shortcut to resume that engagement.
 
 Design spec: `docs/superpowers/specs/2026-06-04-v12-orchestrator-design.md`
 
-Test fixtures: `tests/fixtures/start/synthetic-new/` (new project path, 18/18), `tests/fixtures/start/synthetic-resume/` (registry + resume path, 19/19)
+Test fixtures: `tests/fixtures/start/synthetic-new/`, `tests/fixtures/start/synthetic-resume/`, `tests/fixtures/start/synthetic-transition/` (status transition path) — re-run pending after V1.3
 
 ### Chain status
 
-START (V1.2, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (V1.4.1, done) → ESTIMATOR (V1.5, in progress) → ROADMAP (future)
+START (V1.3, done) → DISCOVERY (done) → MVP_SYNTHESIZER (done) → ARCH_PROPOSER (done) → DOC_GENERATOR (done) → BACKLOG_GENERATOR (V1.4.1, done) → ESTIMATOR (V1.5, done) → ROADMAP (future)
 
 Note: PROJECT_INITIATOR orchestrator is target vision (V1.2+), now in progress with START skill.
 
-### ESTIMATOR (V1.5 — in progress)
+### ESTIMATOR (V1.5 — done)
 
 Skill location: `skills/project-initiator/ESTIMATOR.md`
 

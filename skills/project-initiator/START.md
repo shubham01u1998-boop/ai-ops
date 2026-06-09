@@ -30,9 +30,18 @@ Before asking anything, silently:
 2. Use Read tool to check if `project.md` exists in the current directory.
    - If yes: this is an engagement folder → go to **Resume Single Engagement**.
    - If no: this is the parent directory → continue.
-3. Scan for engagement folders: run `ls -d */` via Bash (ignore errors if no subdirs).
-   - For each subdirectory found, attempt Read on `<subdir>/project.md`.
-   - Build registry list in memory from all successfully read project.md files.
+3. Scan for engagement folders:
+   a. Run `ls -d */` via Bash from current directory (ignore errors if no subdirs).
+   b. Known status buckets: active, blocked, completed, archived.
+   c. For each subdirectory found:
+      - If the subdirectory name matches a known bucket → run `ls -d <bucket>/*/`
+        via Bash to list engagements inside. Mark each found path with its bucket name.
+      - Otherwise → attempt Read on `<subdir>/project.md` directly.
+        If found, mark as status: active (legacy flat folder — no migration prompted).
+   d. For each engagement path collected (bucketed or flat), attempt Read on
+      `<path>/project.md`. On success, add to registry: {path, status, project_data}.
+   e. Build registry sorted by Last session date, most recent first.
+      Within each status group, sort descending.
 4. If registry list is empty → go directly to **New Project Flow** (skip main menu).
 5. If registry list has entries → show **Main Menu**.
 

@@ -93,10 +93,10 @@ Examples: "RetailEdge" → `retailedge` | "Vector Seven" → `vector-seven` | "S
 Show confirmation before any filesystem action:
 ```
 About to create:
-  ~/fiftyfive-engagements/retailedge/
-  ~/fiftyfive-engagements/retailedge/input/
-  ~/fiftyfive-engagements/retailedge/project.md
-  ~/fiftyfive-engagements/retailedge/session_state.md
+  ~/fiftyfive-engagements/active/retailedge/
+  ~/fiftyfive-engagements/active/retailedge/input/
+  ~/fiftyfive-engagements/active/retailedge/project.md
+  ~/fiftyfive-engagements/active/retailedge/session_state.md
 
 Confirm? (yes / no)
 ```
@@ -107,7 +107,7 @@ Cancelled — no folders created.
 ```
 
 On "yes":
-1. Run via Bash: `mkdir -p ~/fiftyfive-engagements/<slug>/input`
+1. Run via Bash: `mkdir -p ~/fiftyfive-engagements/active/<slug>/input`
 2. Write `~/fiftyfive-engagements/<slug>/project.md`:
 
 ```markdown
@@ -132,7 +132,7 @@ Status: not started
 
 ## Next Step
 Run: DISCOVERY
-From: ~/fiftyfive-engagements/<slug>/
+From: ~/fiftyfive-engagements/active/<slug>/
 
 ## Open Items
 (none)
@@ -142,10 +142,10 @@ From: ~/fiftyfive-engagements/<slug>/
 
 Output:
 ```
-Created: ~/fiftyfive-engagements/<slug>/
+Created: ~/fiftyfive-engagements/active/<slug>/
 
-Drop raw engagement docs in ~/fiftyfive-engagements/<slug>/input/
-Then open Claude Code in ~/fiftyfive-engagements/<slug>/ and say: run DISCOVERY
+Drop raw engagement docs in ~/fiftyfive-engagements/active/<slug>/input/
+Then open Claude Code in ~/fiftyfive-engagements/active/<slug>/ and say: run DISCOVERY
 ```
 
 ---

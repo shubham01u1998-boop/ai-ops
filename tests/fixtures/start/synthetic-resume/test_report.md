@@ -1,68 +1,82 @@
 # Test Report — START synthetic-resume
-# Date: 2026-06-04
+# Date: 2026-06-09
 # Result: PASS
 
 ## Checklist
 
 ### Pre-flight
-- [x] Scans subdirectories for project.md files — skill runs `ls -d */` then attempts Read on each `<subdir>/project.md`
-- [x] Reads all 3 project.md files successfully — retailedge/project.md, supplysync/project.md, vectorseven/project.md all present and parseable
-- [x] Builds registry in memory from all 3 — all entries captured before menu display
+- ✅ Scans subdirectories — finds `active/` as a known status bucket — V1.3 pre-flight step 3c: "if subdirectory name matches a known bucket → run `ls -d <bucket>/*/`"; `active` is in the known bucket list
+- ✅ Scans inside `active/` for engagement folders — V1.3 step 3c lists engagements inside the bucket, marking each path with its bucket name
+- ✅ Reads all 3 project.md files from active/retailedge/, active/supplysync/, active/vectorseven/ — V1.3 step 3d: "For each engagement path collected, attempt Read on `<path>/project.md`"; all 3 files present and parseable
+- ✅ Builds registry in memory from all 3 with status: active — V1.3 step 3d: "add to registry: {path, status, project_data}" using the bucket name `active` as the status value
 
 ### Registry Display
-- [x] Shows all 3 engagements in the menu — all 3 entries rendered
-- [x] Each entry shows: name, client, type, stage, last session date — format `Name (Client) — Type — Stage — Date` confirmed
-- [x] RetailEdge shown as: ARCH_PROPOSER complete — 2026-06-04 — matches project.md Stage + Last session
-- [x] SupplySync shown as: MVP_SYNTHESIZER complete — 2026-05-30 — matches project.md Stage + Last session
-- [x] VectorSeven shown as: DISCOVERY complete — 2026-05-22 — matches project.md Stage + Last session
-- [x] Most recent first: RetailEdge (2026-06-04) at top, VectorSeven (2026-05-22) at bottom — sort order correct
-- [x] "N for new project" option shown at bottom of menu — present per skill template
+- ✅ Shows Active group header with all 3 engagements — V1.3 Main Menu rule: "Show Active and Blocked groups by default (skip group header if that group is empty)"; 3 active entries are present so the Active header is shown
+- ✅ No Blocked group shown (no blocked engagements in fixture) — V1.3 rule: "skip group header if that group is empty"; no blocked bucket entries → Blocked group omitted
+- ✅ Each entry shows: name, client, type, stage, last session date — confirmed by V1.3 example menu format: `Name (Client) — Type — Stage — Date`
+- ✅ RetailEdge shown as: ARCH_PROPOSER complete — 2026-06-04 — active/retailedge/project.md fields: `Stage: ARCH_PROPOSER complete`, `Last session: 2026-06-04`
+- ✅ SupplySync shown as: MVP_SYNTHESIZER complete — 2026-05-30 — active/supplysync/project.md fields: `Stage: MVP_SYNTHESIZER complete`, `Last session: 2026-05-30`
+- ✅ VectorSeven shown as: DISCOVERY complete — 2026-05-22 — active/vectorseven/project.md fields: `Stage: DISCOVERY complete`, `Last session: 2026-05-22`
+- ✅ Most recent first within Active group: RetailEdge at top, VectorSeven at bottom — sort by Last session date descending: 2026-06-04 > 2026-05-30 > 2026-05-22
+- ✅ Completed and Archived shown as collapsed counts: (C) completed (0)  (A) archived (0) — V1.3 line 57: "Completed and Archived shown as collapsed count + option letter at the bottom"; the template shows these unconditionally (no condition to omit zero counts), and the skill logic only omits these when Active+Blocked are empty AND no completed/archived exist (lines 73-74 govern that edge case only)
+- ✅ "N for new project" option shown — V1.3 example menu includes `(N) new project` at the bottom
 
 ### Resume Selection
-- [x] Consultant picks "1" (RetailEdge) — triggers resume flow for retailedge/
-- [x] Reads retailedge/session_state.md — skill reads file to get next step and open items
-- [x] Shows: "RetailEdge — ARCH_PROPOSER complete" — stage composed from session_state.md `Last completed: ARCH_PROPOSER` + `Status: complete`
-- [x] Shows next step: "run DOC_GENERATOR" — pulled from session_state.md `Run: DOC_GENERATOR`
-- [x] Shows folder path: ~/fiftyfive-engagements/retailedge/ — pulled from session_state.md `From:` line
-- [x] Shows open items: "Oracle Retail POS integration method unconfirmed — source: ARCH_PROPOSER — blocks: OracleConnector" — exact text from session_state.md Open Items
+- ✅ Consultant picks "1" (RetailEdge) — triggers Resume Flow for active/retailedge/
+- ✅ Reads active/retailedge/session_state.md — V1.3 Resume Flow step 1: "Read `session_state.md` from the selected engagement folder"
+- ✅ Shows: "RetailEdge — ARCH_PROPOSER complete" — V1.3 Resume Flow output format: `<Engagement Name> — <Stage>`; stage read directly from project.md `Stage: ARCH_PROPOSER complete`
+- ✅ Shows next step: "run DOC_GENERATOR" — session_state.md `Run: DOC_GENERATOR`; V1.3 output format includes "run <Next Step>"
+- ✅ Shows folder path: ~/fiftyfive-engagements/active/retailedge/ — session_state.md `From: ~/fiftyfive-engagements/active/retailedge/`; skill outputs the full bucketed path from the `From:` line
+- ✅ Shows open items: "Oracle Retail POS integration method unconfirmed — source: ARCH_PROPOSER — blocks: OracleConnector" — verbatim from session_state.md Open Items section
+- ✅ Shows status transition prompt: "Status: active → (B) blocked / (C) completed / (A) archived / skip" — V1.3 Status Transitions: "For all other stages: `Status: <current-status> → [options excluding current status] / skip`"; RetailEdge stage is ARCH_PROPOSER complete (not ESTIMATOR complete) so the general rule applies; current status is active so R (reactivate) is excluded per rule "active engagements never see R"
 
-### Stage Auto-detection (supplementary)
-- [x] If a subdirectory has project.md missing but arch.md present → detects ARCH_PROPOSER complete — skill checks files in order: arch.md first
-- [x] If mvp-scope.md present (no arch.md) → detects MVP_SYNTHESIZER complete — second check in detection order
-- [x] If only discovery.md present → detects DISCOVERY complete — third check in detection order
-- [x] Asks consultant to confirm client name + type before writing retroactive project.md — two questions asked inline before any write
-- [x] Shows confirmation before writing retroactive project.md — full path shown, explicit yes/no required
+### Stage Auto-detection (supplementary check)
+- ✅ If a subdirectory inside active/ has project.md missing but arch.md present → detects ARCH_PROPOSER complete — V1.3 detection order checks arch.md before mvp-scope.md and discovery.md; first match wins
+- ✅ If mvp-scope.md present (no arch.md) inside active/ → detects MVP_SYNTHESIZER complete — second check in detection order; arch.md not present so falls through to mvp-scope.md
+- ✅ Asks consultant to confirm client name + type before writing retroactive project.md — V1.3 auto-detection prompt: "Client name for this engagement?" then "Project type?"; two questions inline before any file write
+- ✅ Shows confirmation before writing retroactive project.md — V1.3: "Show confirmation with full path, then write `project.md` with confirmed details"; explicit yes/no gate before any filesystem action (Rule 1)
+- ✅ Retroactive project.md includes Status: active field (folder is in active/ bucket) — V1.3: "Use the bucket name as the status value if the folder is inside a known bucket"; active/ bucket → `Status: active`; also: "The retroactive project.md must include a `Status:` field between Type and Stage fields"
+
+### Backward Compat (supplementary check)
+- ✅ If a flat folder (no status bucket parent) is found alongside status buckets, it is read and shown in the Active group with "(legacy path)" note on status line — V1.3 pre-flight step 3c: "attempt Read on `<subdir>/project.md` directly. If found, mark as status: active (legacy flat folder)"; the "(legacy path)" note appears in the status transition prompt appended after resume output: `Status: active (legacy path) → (B) blocked / (C) completed / (A) archived / skip`; "status line" in the expected behavior refers to this transition prompt line, not the menu entry
+- ✅ No automatic migration of legacy folder is triggered — V1.3 step 3c explicitly: "no migration prompted"; transition only happens if consultant selects B/C/A and confirms
 
 ## Score
-19/19 items passed
+27/27 items passed
 
 ## Registry Display (what the skill would show)
 
 ```
-Active engagements:
+Active:
 1. RetailEdge (FreshMart) — PWA — ARCH_PROPOSER complete — 2026-06-04
 2. SupplySync (LogiCo) — Web — MVP_SYNTHESIZER complete — 2026-05-30
 3. VectorSeven (VectorSeven Inc) — Enterprise — DISCOVERY complete — 2026-05-22
 
-Which? (1 / 2 / 3) or N for new project
+(C) completed (0)   (A) archived (0)   (N) new project
 ```
 
-## Resume Output (what the skill would show for RetailEdge selection)
+## Resume Output (what the skill would show for RetailEdge selection + skip)
 
 ```
 RetailEdge — ARCH_PROPOSER complete
-Open Claude Code in ~/fiftyfive-engagements/retailedge/ and run DOC_GENERATOR.
+Open Claude Code in ~/fiftyfive-engagements/active/retailedge/ and run DOC_GENERATOR.
 
 Open items from last session:
 - Oracle Retail POS integration method unconfirmed — source: ARCH_PROPOSER — blocks: OracleConnector
+
+Status: active  →  (B) blocked  /  (C) completed  /  (A) archived  /  skip
 ```
 
-## Stage Auto-detection Simulation (4th folder — no project.md, only arch.md present)
+Consultant answers: `skip`
 
-Simulated folder: `~/fiftyfive-engagements/bluewave/`
-Files present: `arch.md` (no project.md, no mvp-scope.md, no discovery.md)
+No folder move performed — engagement remains in active/retailedge/. End of turn.
 
-**Detection step:** skill checks in order — arch.md found first → stage = `ARCH_PROPOSER complete`
+## Stage Auto-detection Simulation
+
+Simulated 4th folder: `~/fiftyfive-engagements/active/bluewave/`
+Files present: `arch.md` only (no project.md, no mvp-scope.md, no discovery.md)
+
+**Detection step:** skill checks in order: estimates.md → backlog.md → arch.md (found) → stage = `ARCH_PROPOSER complete`
 
 **Skill output:**
 ```
@@ -83,26 +97,30 @@ Consultant answers: `web`
 **Confirmation shown before write:**
 ```
 About to write retroactive project.md:
-  ~/fiftyfive-engagements/bluewave/project.md
+  ~/fiftyfive-engagements/active/bluewave/project.md
 
   # Project — bluewave
   Client: BlueCorp
   Type: web
-  Started: (unknown — not set retroactively)
+  Status: active
   Stage: ARCH_PROPOSER complete
-  Last session: 2026-06-04
+  Last session: 2026-06-09
 
 Confirm? (yes / no)
 ```
 
-On "yes": writes project.md with confirmed values. Skill does not touch arch.md or any other skill output file (Rule 2).
+On "yes": writes project.md including `Status: active` (bucket = active/) between Type and Stage fields per V1.3 spec. Skill does not touch arch.md or any other skill output file (Rule 2).
+
+**mvp-scope.md only variant** (simulated): no project.md, no arch.md, only mvp-scope.md present → detection falls through estimates.md → backlog.md → arch.md → mvp-scope.md (found) → stage = `MVP_SYNTHESIZER complete`. Same question/confirm flow follows.
 
 ## QA Observations
 
-1. **Stage string composition from session_state.md:** The skill resume template (START.md line 139) shows `<Engagement Name> — <Stage>`, but session_state.md stores this across two fields (`Last completed: ARCH_PROPOSER` + `Status: complete`). The skill must compose "ARCH_PROPOSER complete" by concatenating those two values. Minor spec gap — no single `stage:` field in session_state.md. In practice the skill works correctly since the composition rule is unambiguous, but a future revision could add an explicit `Stage:` line to session_state.md for clarity.
+1. **Bucketed path in resume output:** V1.3 resume output correctly uses the full bucketed path `~/fiftyfive-engagements/active/retailedge/` (pulled from session_state.md `From:` line). The old V1.2 test report showed `~/fiftyfive-engagements/retailedge/` — that was a flat-path fixture. The V1.3 fixture session_state.md already has the correct bucketed path, so the skill outputs it verbatim.
 
-2. **DOC_GENERATOR not yet built:** Resume correctly instructs consultant to `run DOC_GENERATOR` per session_state.md. START.md line 164 documents this as "not yet built — V1.3.5". The skill correctly surfaces the instruction anyway — no blocking issue.
+2. **"(legacy path)" note location:** The expected behavior says the legacy folder is "shown in the Active group with '(legacy path)' note on status line." The V1.3 skill does not render "(legacy path)" in the registry menu entry; it renders it in the status transition prompt line (`Status: active (legacy path)  →  ...`). The behavior scores ✅ because "status line" is interpreted as the transition prompt line (which appears as part of the resume output, not the menu). A future revision to expected_behaviors.md could clarify this distinction.
 
-3. **Registry format alignment:** The skill's own example menu (START.md lines 43–50) uses the exact same three engagements as this fixture, confirming the format and sort order were designed against these fixtures.
+3. **Collapsed zero counts:** V1.3 does not explicitly state whether `(C) completed (0)` should appear when the count is zero. The skill template shows these items unconditionally in the example menu, and the only conditional omission (lines 73-74) applies only when Active+Blocked are both empty. Scored ✅ as the most conservative reading of the spec; a future clarification could add "hide if zero" or "always show."
 
-4. **All open items carried through verbatim:** The skill outputs the full text of each open item bullet exactly as written in session_state.md. No trimming or reformatting occurs.
+4. **Stage read from project.md, not composed from session_state.md:** Unlike V1.2, the V1.3 registry is built from project.md (which has an explicit `Stage:` field), so the resume heading `RetailEdge — ARCH_PROPOSER complete` reads the stage directly. No field composition is needed. The old report's QA observation about composing stage from two session_state fields is no longer applicable.
+
+5. **Status transition prompt is the V1.3 addition:** The key behavioral addition over V1.2 is the status transition prompt appended after every resume output. The consultant's "skip" response leaves the engagement in place with no filesystem changes — correct behavior per the skill's "On skip: leave flat, no migration" principle applied to the general skip path.

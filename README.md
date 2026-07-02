@@ -13,6 +13,7 @@ skills/project-initiator — Project Initiator toolchain (START → ESTIMATOR)
 context                  — TEAM_CONTEXT.md, PARKING_LOT.md, session state
 docs                     — system flow diagrams, demo scripts, test suites, design specs
 tests/fixtures           — synthetic engagement fixtures for each skill
+engagements/             — real engagement outputs (reference examples, see below)
 odoo-mcp/                — Python MCP server (38/38 tests passing)
 templates                — generic project template for replication
 ci                       — GitLab CI scripts
@@ -287,6 +288,36 @@ If you ran BACKLOG_GENERATOR before and chose `[C] Skip` (kept backlog.md as DRA
 1. Re-run BACKLOG_GENERATOR from the same folder
 2. It detects `backlog.md` with `Status: DRAFT` and offers `[A] Push backlog.md to Odoo now`
 3. Select `[A]` — it runs the full creation flow using the existing backlog.md
+
+---
+
+## Reference Engagements (`engagements/`)
+
+The `engagements/` folder contains real engagement outputs produced by the Project Initiator toolchain. These are committed here as reference examples — to show what each skill generates end-to-end on an actual client project, not a synthetic fixture.
+
+```
+engagements/
+  active/
+    decorconnect/          ← Interior design platform engagement
+      project.md           ← engagement metadata (client, type, stage)
+      session_state.md     ← last session stage + next step
+      discovery.md         ← DISCOVERY output
+      mvp-scope.md         ← MVP_SYNTHESIZER output
+      arch.md              ← ARCH_PROPOSER output
+      backlog.md           ← BACKLOG_GENERATOR output
+      estimates.md         ← ESTIMATOR output
+      docs/
+        proposal-sow.md
+        technical-architecture.md
+        sprint-plan.md
+        developer-handoff.md
+        scope-agreement.md
+  blocked/
+  completed/
+  archived/
+```
+
+**Note:** Client input documents (PDFs) are excluded. The `engagements/` folder in this repo is a read-only reference — the live working copy lives at `~/fiftyfive-engagements/` on the consultant's machine.
 
 ---
 

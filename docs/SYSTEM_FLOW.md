@@ -1,5 +1,7 @@
 # TiffinConnect AI Ticket Pipeline — System Flow
-# VERSION: 1.0 | Created: 2026-05-21 | Phase: 1 complete, Phase 2 not started
+# VERSION: 1.2 | Created: 2026-05-21 | Updated: 2026-06-09
+# Phase 1 (ticket intake): complete | Phase 2: not started
+# Project Initiator V1.5 (ESTIMATOR): done | Chain: START → DISCOVERY → MVP_SYNTHESIZER → ARCH_PROPOSER → DOC_GENERATOR → BACKLOG_GENERATOR → ESTIMATOR
 
 ---
 
@@ -110,6 +112,10 @@
 | S3b Draft Queue Failure | Not shown | Wired into failure path in S9 |
 | TEAM_CONTEXT System Roles | Not shown | QA Lead / PM / Lead / Triage Owner now defined |
 | Phase 2 classifier | Shown as S1 box | Not yet built — Routing Rule is the temp replacement |
+| LAYER_2_DISCOVERY | Planned in Phase 2 | Retired — covered by Project Initiator DISCOVERY skill |
+| FASTPATH S1 "DISCOVERY path" | Named DISCOVERY | Renamed to INTAKE_INTERVIEW path — avoids name collision with PI skill |
+| Project Initiator | Not in flow | Separate pipeline — START → DISCOVERY → MVP_SYNTHESIZER → ARCH_PROPOSER → DOC_GENERATOR → BACKLOG_GENERATOR → ESTIMATOR → ROADMAP (future) |
+| Readiness Gate | Not in flow | Embedded in each downstream PI skill — validates upstream artifact before proceeding |
 
 ---
 
@@ -120,12 +126,16 @@ When Phase 2 is complete, these will slot in between LAYER_0 and the skill files
 ```
 LAYER_1_CLASSIFIER      — smart routing brain, replaces Routing Rule
 LAYER_2_PREPROCESSOR    — structured interview for vague requirements
-LAYER_2_DISCOVERY       — full BA-style interview
 REQUIREMENT_BRIDGE      — PRD → TRD conversion
 LAYER_3_TICKET_MAPPER   — replaces S9 inline mapper
 PRD_BREAKDOWN           — decompose PRD into discrete tickets
 SESSION_STATE           — session tracking for long runs
 ```
+
+Note: `LAYER_2_DISCOVERY` has been retired from Phase 2 scope. The Project Initiator's
+DISCOVERY skill (skills/project-initiator/) covers BA-style extraction for new engagements.
+The FASTPATH S1 reference to "DISCOVERY path" has been renamed "INTAKE_INTERVIEW path"
+to eliminate the name collision.
 
 ---
 
@@ -173,6 +183,204 @@ This is frequently described incorrectly in presenter notes. The real behaviour:
 > "Claude fetched all existing bug tickets once and matched your ticket title against them in memory. That single `list_tickets` call is the entire duplicate check — results are cached so it won't re-fetch for the rest of the session."
 
 **Note on two Vijays:** Odoo has `vijay.jangid (ID 23)` and `vijay.mehrotra (ID 62)`. TEAM_CONTEXT Section 1 maps "Vijay" → Mehrotra (62). Claude will always resolve to ID 62. Heads-up the team so there is no confusion during live use.
+
+---
+
+---
+
+## Project Initiator Flow (separate pipeline — runs from engagement folders)
+
+This pipeline is independent of the ticket intake flow above. It runs from
+`~/fiftyfive-engagements/<client-name>/` via Claude Code, not Claude Enterprise.
+
+Chain: START → DISCOVERY → MVP_SYNTHESIZER → ARCH_PROPOSER → DOC_GENERATOR → BACKLOG_GENERATOR → ESTIMATOR → ROADMAP (future)
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  ENGAGEMENT FOLDER  ~/fiftyfive-engagements/<client-name>/           ║
+║  input/             ← raw docs (PDF, text, markdown)                 ║
+║  project.md         ← created by START, updated by each skill        ║
+║  session_state.md   ← written by each skill on completion            ║
+║  discovery.md       ← produced by DISCOVERY                          ║
+║  mvp-scope.md       ← produced by MVP_SYNTHESIZER                    ║
+║  arch.md            ← produced by ARCH_PROPOSER                      ║
+║  backlog.md         ← produced by BACKLOG_GENERATOR                  ║
+║  estimates.md       ← produced by ESTIMATOR                          ║
+║  docs/              ← produced by DOC_GENERATOR (SOW, arch doc, etc) ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ say: run START (from parent dir)
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  START  (V1.2 — done)  skills/project-initiator/START.md             ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Pre-flight: detect location (parent dir or engagement dir) │    ║
+║  │                                                             │    ║
+║  │  New Project Flow                                           │    ║
+║  │    Ask: client name · engagement name · project type        │    ║
+║  │    Confirm before creating: folder + input/ + project.md   │    ║
+║  │    Write project.md + session_state.md (Stage: not started) │    ║
+║  │    Output: "Drop docs in input/, then run DISCOVERY"        │    ║
+║  │                                                             │    ║
+║  │  Resume Flow (registry from all project.md files)           │    ║
+║  │    Display: name · client · type · stage · last session     │    ║
+║  │    On select: read session_state.md → show next step        │    ║
+║  │                        + open items from last session       │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ say: run DISCOVERY
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  DISCOVERY  (V1.0 — done)  skills/project-initiator/DISCOVERY.md    ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Pre-flight                                                  │    ║
+║  │    basename "$PWD" → engagement name                        │    ║
+║  │    Glob input/*    → list + read all docs                   │    ║
+║  │                                                             │    ║
+║  │  Extraction Pass (silent)                                   │    ║
+║  │    Project · Users · Core Problem · Features · Tech         │    ║
+║  │    Timeline · Constraints · Conflicts · Gaps                │    ║
+║  │    Confidence: HIGH / MED / LOW per category                │    ║
+║  │                                                             │    ║
+║  │  Question Loop  (one at a time)                             │    ║
+║  │    Phase 1: resolve conflicts first                         │    ║
+║  │    Phase 2: critical gaps                                   │    ║
+║  │    Phase 3: detail gaps (deferrable)                        │    ║
+║  │                                                             │    ║
+║  │  Draft Artifact → consultant approves → Save discovery.md  │    ║
+║  │  Writes session_state.md  ·  Updates project.md            │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ discovery.md  ·  say: run MVP_SYNTHESIZER
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  MVP_SYNTHESIZER  (V1.1 — done)                                      ║
+║  skills/project-initiator/MVP_SYNTHESIZER.md                         ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Readiness Gate on discovery.md                             │    ║
+║  │    Required: Core Problem · Users · ≥2 Features ·           │    ║
+║  │              Timeline · no unresolved CONFLICTs             │    ║
+║  │                                                             │    ║
+║  │  Framing Selection  (consultant picks one)                  │    ║
+║  │    A) Time-boxed  · B) Risk-first  · C) Value-first        │    ║
+║  │                                                             │    ║
+║  │  Feature Prioritization  (IN / OUT / DEFERRED)              │    ║
+║  │  User Journey Extraction  ·  Success Metrics                │    ║
+║  │                                                             │    ║
+║  │  Draft Artifact → consultant approves → Save mvp-scope.md  │    ║
+║  │  Writes session_state.md  ·  Updates project.md            │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ mvp-scope.md  ·  say: run ARCH_PROPOSER
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  ARCH_PROPOSER  (V1.3 — done)  skills/project-initiator/ARCH_PROPOSER.md ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Readiness Gate on discovery.md + mvp-scope.md              │    ║
+║  │                                                             │    ║
+║  │  Tech Stack Menu  (constrained options, STRAWMAN marker)    │    ║
+║  │  Component Map  (frontend · backend · infra · integrations) │    ║
+║  │  Build Order  (sprint-mapped, dependency-ordered)           │    ║
+║  │  Effort Signals  (S/M/L/XL per component)                   │    ║
+║  │                                                             │    ║
+║  │  Draft Artifact → consultant approves → Save arch.md       │    ║
+║  │  Writes session_state.md  ·  Updates project.md            │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ arch.md  ·  say: run DOC_GENERATOR
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  DOC_GENERATOR  (V1.3.5 — done)  skills/project-initiator/DOC_GENERATOR.md ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Sync Check: cross-validates discovery.md + mvp-scope.md   │    ║
+║  │              + arch.md for drift / inconsistency            │    ║
+║  │    DRIFT → blocks menu until resolved or deferred           │    ║
+║  │    WARN  → passes through, flagged in affected docs         │    ║
+║  │                                                             │    ║
+║  │  Document Menu  (consultant picks one or more):             │    ║
+║  │    1. Project Proposal / SOW                                │    ║
+║  │    2. Technical Architecture Doc                            │    ║
+║  │    3. Sprint Plan                                           │    ║
+║  │    4. Developer Handoff Doc                                 │    ║
+║  │    5. Scope Agreement                                       │    ║
+║  │                                                             │    ║
+║  │  Each doc saved to docs/ with Mermaid diagrams              │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ docs/  ·  say: run BACKLOG_GENERATOR
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  BACKLOG_GENERATOR  (V1.4.1 — done)                                  ║
+║  skills/project-initiator/BACKLOG_GENERATOR.md                       ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Readiness Gate on arch.md                                  │    ║
+║  │                                                             │    ║
+║  │  Project Setup: name + stages (Odoo project created)        │    ║
+║  │  Team Role Mapping  (Odoo user IDs)                         │    ║
+║  │  Ticket Hierarchy: parent per Build Order item + subtasks   │    ║
+║  │  Duplicate Check: list_tickets before creation              │    ║
+║  │  Sprint Tags: one Odoo tag per sprint, every ticket tagged  │    ║
+║  │                                                             │    ║
+║  │  Writes backlog.md → CONFIRM ALL → bulk_create_tickets      │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ backlog.md + Odoo project  ·  say: run ESTIMATOR
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  ESTIMATOR  (V1.5 — done)  skills/project-initiator/ESTIMATOR.md    ║
+║  ┌─────────────────────────────────────────────────────────────┐    ║
+║  │  Readiness Gate on arch.md + backlog.md                     │    ║
+║  │    Required: Effort Signals + Sprint Mapping + Build Order   │    ║
+║  │                                                             │    ║
+║  │  Config: estimate style (fixed / range) · cost rates        │    ║
+║  │          project start date                                 │    ║
+║  │                                                             │    ║
+║  │  Compute: hours per sprint · contingency · total cost       │    ║
+║  │  Review Table: sprint-by-sprint breakdown                   │    ║
+║  │                                                             │    ║
+║  │  Writes estimates.md  →  Odoo gate (optional)               │    ║
+║  └─────────────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════╦═══════════════════════════════════╝
+                                   ║ estimates.md
+                                   ▼
+╔══════════════════════════════════════════════════════════════════════╗
+║  ROADMAP  (future)                                                   ║
+║    Planned: delivery roadmap from Odoo board + arch.md               ║
+║    Output: roadmap.md — quarterly view, milestone format             ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+### Readiness Gate Pattern (embedded in each downstream skill)
+
+Every downstream skill opens with a Readiness Gate that validates the upstream artifact
+before any skill logic runs. Gate never auto-fills. Gate never redirects to a previous
+skill — resolves inline.
+
+| Status | Meaning | Behaviour |
+|---|---|---|
+| ✓ PASS | Field present, confidence HIGH or MED | Proceed silently |
+| ⚠ WARN | Present but LOW confidence, or ambiguous | Flag in output Confidence Notes; do not block |
+| ✗ BLOCK | Field missing or unresolved CONFLICT | Ask one inline question; proceed only after resolved or deferred |
+
+Deferred BLOCKs become WARNs + Open Questions in the output artifact.
+
+### Project Initiator — Test Fixtures
+
+| Fixture | Path | Score |
+|---|---|---|
+| DISCOVERY synthetic-01 | tests/fixtures/discovery/synthetic-01/ | SupplySync PASS-path — 64/64 |
+| DISCOVERY synthetic-02 | tests/fixtures/discovery/synthetic-02/ | StyleMart PASS-path — 64/64 |
+| MVP_SYNTHESIZER synthetic-01 | tests/fixtures/mvp-synthesizer/synthetic-01/ | PASS-path — clean discovery.md |
+| MVP_SYNTHESIZER synthetic-02-incomplete | tests/fixtures/mvp-synthesizer/synthetic-02-incomplete/ | BLOCK-path — 3 deliberate BLOCKs |
+| START synthetic-new | tests/fixtures/start/synthetic-new/ | New project creation — 18/18 |
+| START synthetic-resume | tests/fixtures/start/synthetic-resume/ | Registry + resume path — 19/19 |
+| ARCH_PROPOSER synthetic-01 | tests/fixtures/arch-proposer/synthetic-01/ | SupplySync PASS-path — 49/49 |
+| ARCH_PROPOSER synthetic-02-incomplete | tests/fixtures/arch-proposer/synthetic-02-incomplete/ | RetailEdge BLOCK-path — 17/17 |
+| DOC_GENERATOR synthetic-01 | tests/fixtures/doc-generator/synthetic-01/ | RetailEdge PASS-path — 56/56 |
+| DOC_GENERATOR synthetic-02-drift | tests/fixtures/doc-generator/synthetic-02-drift/ | RetailEdge DRIFT-path — 22/22 |
+| BACKLOG_GENERATOR synthetic-01 | tests/fixtures/backlog-generator/synthetic-01/ | PASS-path — 72/72 |
+| BACKLOG_GENERATOR synthetic-02-duplicate | tests/fixtures/backlog-generator/synthetic-02-duplicate/ | Duplicate detection — 22/22 |
+| ESTIMATOR synthetic-01 | tests/fixtures/estimator/synthetic-01/ | Fixed hours PASS — 48/48 |
+| ESTIMATOR synthetic-02-range | tests/fixtures/estimator/synthetic-02-range/ | Range + cost + date override — 45/45 |
 
 ---
 

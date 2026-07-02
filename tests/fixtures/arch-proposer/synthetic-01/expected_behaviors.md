@@ -65,3 +65,6 @@
 - [ ] arch.md written only after explicit consultant approval
 - [ ] arch.md written to current working directory
 - [ ] Completion message shown with "Next: run BACKLOG_GENERATOR"
+
+## Test Notes
+- **Basename behavior:** This fixture lives in `synthetic-01/` — a generic folder name. When run from this folder, `basename "$PWD"` returns `synthetic-01`, so ARCH_PROPOSER will ask for the engagement name before proceeding. Answer: **RetailEdge**. This is correct behavior, not a defect. In a real client folder (`retailedge/`), the engagement name resolves automatically.

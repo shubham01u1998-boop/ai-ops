@@ -24,3 +24,6 @@
 - [ ] Skill continues normally after gate clears
 - [ ] Deferred BLOCKs appear as WARNs in arch.md Confidence Notes
 - [ ] Deferred CONFLICT appears in STRAWMAN Summary
+
+## Test Notes
+- **Basename behavior:** This fixture lives in `synthetic-02-incomplete/` — a generic folder name. When run from this folder, `basename "$PWD"` returns `synthetic-02-incomplete`, so ARCH_PROPOSER will ask for the engagement name before proceeding. Answer: **StyleMart**. This is correct behavior, not a defect. In a real client folder (`stylemart/`), the engagement name resolves automatically.
